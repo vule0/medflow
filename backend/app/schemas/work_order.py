@@ -29,3 +29,16 @@ class DiscrepancyRead(BaseModel):
     technician_hospital_id: int
     
     model_config = ConfigDict(from_attributes=True)
+    
+
+
+class TechnicianActiveMissions(BaseModel):
+    technician_id: int
+    technician_name: str
+    active_work_order_count: int
+
+
+class ReportingLineResult(BaseModel):
+    supervisor_id: int
+    technician_count: int
+    technicians: list[TechnicianActiveMissions]

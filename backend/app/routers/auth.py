@@ -20,7 +20,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(),
     if user is None or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Incorrect username or password.",
             headers={"WWW-Authenticate": "Bearer"}
         )
         

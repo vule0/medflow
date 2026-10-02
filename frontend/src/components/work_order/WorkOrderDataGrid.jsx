@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import {
     DataGrid,
     GridActionsCellItem
@@ -24,428 +25,798 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import apiClient from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
 
-function EquipmentDataGrid({ onSuccess }) {
-    const { user, role } = useAuth();
 
-    const STATUS_OPTIONS = [
-        "Available",
-        "In-Use",
-        "Maintenance",
-        "Offline"
+function WorkOrderDataGrid({ onSuccess = () => { } }) {
+
+    const { user } = useAuth();
+    const role = user?.role;
+
+    const PRIORITY_OPTIONS = [
+        "Low",
+        "Medium",
+        "Critical"
     ];
 
-    const [equipment, setEquipment] = useState([]);
+    const STATUS_OPTIONS = [
+        "Pending",
+        "In-Progress",
+        "Completed",
+        "Failed"
+    ];
+
+
+    const [workOrders, setWorkOrders] = useState([]);
+
     const [loading, setLoading] = useState(true);
+
     const [error, setError] = useState(null);
 
     const [dialogOpen, setDialogOpen] = useState(false);
+
     const [editDialogOpen, setEditDialogOpen] = useState(false);
 
-    const [selectedEquipment, setSelectedEquipment] = useState(null);
+    const [selectedWorkOrder, setSelectedWorkOrder] = useState(null);
+
 
     const [formValues, setFormValues] = useState({
-        serial_number: "",
-        model: "",
-        status: "Offline",
-        charge_level: "",
-        hospital_id: ""
+        title: "",
+        priority: "Low",
+        status: "Pending",
+        equipment_id: "",
+        technician_id: ""
     });
+
 
     const [editFormValues, setEditFormValues] = useState({
-        serial_number: "",
-        model: "",
-        status: "Offline",
-        charge_level: "",
-        hospital_id: ""
+        title: "",
+        priority: "Low",
+        status: "Pending",
+        equipment_id: "",
+        technician_id: ""
     });
 
-    async function fetchEquipment() {
+
+    async function fetchWorkOrders() {
+
         setLoading(true);
 
         try {
-            const response = await apiClient.get("/equipments");
 
-            setEquipment(response.data);
+            const response = await apiClient.get("/work_orders");
+
+            setWorkOrders(response.data);
+
             setError(null);
+
         } catch {
-            setError("Could not load equipment data");
+
+            setError("Could not load work order data");
+
         } finally {
+
             setLoading(false);
+
         }
     }
 
+
     useEffect(() => {
-        fetchEquipment();
+
+        fetchWorkOrders();
+
     }, []);
 
+
     const handleFieldChange = (field) => (event) => {
+
         setFormValues((prev) => ({
             ...prev,
             [field]: event.target.value
         }));
+
     };
 
+
     const handleEditFieldChange = (field) => (event) => {
+
         setEditFormValues((prev) => ({
             ...prev,
             [field]: event.target.value
         }));
+
     };
 
-    const handleCreate = async () => {
+
+    async function handleCreate() {
+
         try {
-            await apiClient.post("/equipments", {
+
+            await apiClient.post("/work_orders", {
+
                 ...formValues,
-                charge_level: Number(formValues.charge_level),
-                hospital_id: Number(formValues.hospital_id)
+
+                equipment_id: Number(formValues.equipment_id),
+
+                technician_id: Number(formValues.technician_id)
+
             });
+
 
             setDialogOpen(false);
 
+
             onSuccess(
-                `Equipment ${formValues.serial_number} created successfully`
+                `Work order "${formValues.title}" created successfully`
             );
+
 
             setFormValues({
-                serial_number: "",
-                model: "",
-                status: "Offline",
-                charge_level: "",
-                hospital_id: ""
+
+                title: "",
+
+                priority: "Low",
+
+                status: "Pending",
+
+                equipment_id: "",
+
+                technician_id: ""
+
             });
 
-            await fetchEquipment();
-        } catch (error) {
-            setError(
-                error.response?.data?.detail ||
-                "Could not create equipment"
-            );
-        }
-    };
 
-    function handleEdit(equipment) {
-        setSelectedEquipment(equipment);
+            await fetchWorkOrders();
+
+        } catch (error) {
+
+            setError(
+
+                error.response?.data?.detail ||
+
+                "Could not create work order"
+
+            );
+
+        }
+
+    }
+
+
+    function handleEdit(workOrder) {
+
+        setSelectedWorkOrder(workOrder);
+
 
         setEditFormValues({
-            serial_number: equipment.serial_number,
-            model: equipment.model,
-            status: equipment.status,
-            charge_level: equipment.charge_level,
-            hospital_id: equipment.hospital_id
+
+            title: workOrder.title,
+
+            priority: workOrder.priority,
+
+            status: workOrder.status,
+
+            equipment_id: workOrder.equipment_id,
+
+            technician_id: workOrder.technician_id
+
         });
 
+
         setEditDialogOpen(true);
+
     }
 
-    async function handleDelete(equipment) {
+
+    async function handleDelete(workOrder) {
+
         try {
+
             await apiClient.delete(
-                `/equipments/${equipment.id}`
+                `/work_orders/${workOrder.id}`
             );
+
 
             onSuccess(
-                `Equipment ${equipment.id} deleted successfully`
+                `Work order "${workOrder.title}" deleted successfully`
             );
 
-            await fetchEquipment();
+
+            await fetchWorkOrders();
+
         } catch (error) {
+
             setError(
+
                 error.response?.data?.detail ||
-                "Could not delete equipment. Please try again later"
+
+                "Could not delete work order. Please try again later"
+
             );
+
         }
+
     }
 
-    async function handleUpdate(equipment) {
+
+    async function handleUpdate(workOrder) {
+
         try {
+
             await apiClient.patch(
-                `/equipments/${equipment.id}`,
+
+                `/work_orders/${workOrder.id}`,
+
                 {
+
                     ...editFormValues,
-                    charge_level: Number(editFormValues.charge_level),
-                    hospital_id: Number(editFormValues.hospital_id)
+
+                    equipment_id: Number(
+                        editFormValues.equipment_id
+                    ),
+
+                    technician_id: Number(
+                        editFormValues.technician_id
+                    )
+
                 }
+
             );
+
 
             setEditDialogOpen(false);
 
+
             onSuccess(
-                `Equipment ${equipment.id} updated successfully`
+                `Work order "${workOrder.title}" updated successfully`
             );
 
-            await fetchEquipment();
+
+            await fetchWorkOrders();
+
         } catch (error) {
+
             setError(
+
                 error.response?.data?.detail ||
-                "Could not update equipment"
+
+                "Could not update work order"
+
             );
+
         }
+
     }
 
+
     const columns = [
+
         {
             field: "id",
             headerName: "ID",
             flex: 0.5
         },
+
         {
-            field: "serial_number",
-            headerName: "Serial Number",
-            flex: 1
+            field: "title",
+            headerName: "Title",
+            flex: 1.5
         },
+
         {
-            field: "model",
-            headerName: "Model",
-            flex: 1
+            field: "priority",
+            headerName: "Priority",
+            flex: 0.8
         },
+
         {
             field: "status",
             headerName: "Status",
-            flex: 0.8
+            flex: 1
         },
+
         {
-            field: "charge_level",
-            headerName: "Charge Level (%)",
-            flex: .7,
+            field: "equipment_id",
+            headerName: "Equipment ID",
+            flex: 0.8,
             type: "number"
         },
+
         {
-            field: "hospital_id",
-            headerName: "Hospital ID",
-            flex: 0.5,
+            field: "technician_id",
+            headerName: "Technician ID",
+            flex: 0.8,
             type: "number"
         },
-        ...(role === "Clinical Admin"
+
+
+        ...((role === "Clinical Admin" || role === "Field Technician")
+
             ? [
+
                 {
+
                     field: "actions",
+
                     type: "actions",
+
                     headerName: "Actions",
-                    flex: 0.6,
+
+                    flex: 0.7,
+
                     getActions: (params) => [
+
                         <GridActionsCellItem
+
                             key="edit"
+
                             label="Edit"
+
                             icon={<EditIcon />}
-                            onClick={() => handleEdit(params.row)}
+
+                            onClick={() =>
+                                handleEdit(params.row)
+                            }
+
                         />,
-                        <GridActionsCellItem
+
+                        ...(role === "Clinical Admin" ? 
+                            [<GridActionsCellItem
+
                             key="delete"
+
                             label="Delete"
+
                             icon={<DeleteIcon />}
-                            onClick={() => handleDelete(params.row)}
-                        />
+
+                            onClick={() =>
+                                handleDelete(params.row)
+                            }
+
+                        />] : [])
+                        
+
                     ]
+
                 }
+
             ]
+
             : [])
+
     ];
 
+
     if (loading) {
+
         return <CircularProgress />;
+
     }
+
 
     if (error) {
+
         return (
+
             <Alert severity="error">
+
                 {error}
+
             </Alert>
+
         );
+
     }
 
+
     return (
+
         <Box sx={{ width: "100%" }}>
 
+
             {role === "Clinical Admin" && (
+
                 <Button
+
                     variant="outlined"
-                    color="primary"
+
                     sx={{ mb: 2 }}
+
                     onClick={() => setDialogOpen(true)}
+
                 >
-                    Add Equipment
+
+                    Add Work Order
+
                 </Button>
+
             )}
 
+
             <Box sx={{ height: 500, width: "100%" }}>
+
                 <DataGrid
+
                     hideFooter
-                    rows={equipment}
+
+                    rows={workOrders}
+
                     columns={columns}
+
                     getRowId={(row) => row.id}
+
                 />
+
             </Box>
 
-            {/* Create Equipment Dialog */}
+
+            {/* Create Work Order Dialog */}
+
             <Dialog
+
                 open={dialogOpen}
+
                 onClose={() => setDialogOpen(false)}
+
             >
+
                 <DialogTitle
+
                     sx={{
+
                         color: "black",
+
                         textAlign: "center"
+
                     }}
+
                 >
-                    Add New Equipment
+
+                    Add New Work Order
+
                 </DialogTitle>
 
+
                 <DialogContent>
+
                     <Stack
+
                         spacing={2}
+
                         sx={{
+
                             mt: 1,
+
                             minWidth: 300
+
                         }}
+
                     >
-                        <TextField
-                            label="Serial Number"
-                            value={formValues.serial_number}
-                            onChange={handleFieldChange("serial_number")}
-                        />
 
                         <TextField
-                            label="Model"
-                            value={formValues.model}
-                            onChange={handleFieldChange("model")}
+
+                            label="Title"
+
+                            value={formValues.title}
+
+                            onChange={handleFieldChange("title")}
+
                         />
 
+
                         <TextField
+
                             select
-                            label="Status"
-                            value={formValues.status}
-                            onChange={handleFieldChange("status")}
+
+                            label="Priority"
+
+                            value={formValues.priority}
+
+                            onChange={handleFieldChange("priority")}
+
                         >
-                            {STATUS_OPTIONS.map((option) => (
+
+                            {PRIORITY_OPTIONS.map((option) => (
+
                                 <MenuItem
+
                                     key={option}
+
                                     value={option}
+
                                 >
+
                                     {option}
+
                                 </MenuItem>
+
                             ))}
+
                         </TextField>
 
-                        <TextField
-                            label="Charge Level (%)"
-                            type="number"
-                            value={formValues.charge_level}
-                            onChange={handleFieldChange("charge_level")}
-                        />
 
                         <TextField
-                            label="Hospital ID"
+
+                            select
+
+                            label="Status"
+
+                            value={formValues.status}
+
+                            onChange={handleFieldChange("status")}
+
+                        >
+
+                            {STATUS_OPTIONS.map((option) => (
+
+                                <MenuItem
+
+                                    key={option}
+
+                                    value={option}
+
+                                >
+
+                                    {option}
+
+                                </MenuItem>
+
+                            ))}
+
+                        </TextField>
+
+
+                        <TextField
+
+                            label="Equipment ID"
+
                             type="number"
-                            value={formValues.hospital_id}
-                            onChange={handleFieldChange("hospital_id")}
+
+                            value={formValues.equipment_id}
+
+                            onChange={handleFieldChange("equipment_id")}
+
                         />
+
+
+                        <TextField
+
+                            label="Technician ID"
+
+                            type="number"
+
+                            value={formValues.technician_id}
+
+                            onChange={handleFieldChange("technician_id")}
+
+                        />
+
                     </Stack>
+
                 </DialogContent>
 
+
                 <DialogActions>
-                    <Button
-                        variant="contained"
-                        color="error"
-                        onClick={() => setDialogOpen(false)}
-                    >
-                        Close
-                    </Button>
 
                     <Button
+
                         variant="contained"
-                        onClick={handleCreate}
+
+                        color="error"
+
+                        onClick={() => setDialogOpen(false)}
+
                     >
-                        Create
+
+                        Close
+
                     </Button>
+
+
+                    <Button
+
+                        variant="contained"
+
+                        onClick={handleCreate}
+
+                    >
+
+                        Create
+
+                    </Button>
+
                 </DialogActions>
+
             </Dialog>
 
-            {/* Edit Equipment Dialog */}
+
+            {/* Edit Work Order Dialog */}
+
             <Dialog
+
                 open={editDialogOpen}
+
                 onClose={() => setEditDialogOpen(false)}
+
             >
+
                 <DialogTitle
+
                     sx={{
+
                         color: "black",
+
                         textAlign: "center"
+
                     }}
+
                 >
-                    Edit Equipment
+
+                    Edit Work Order
+
                 </DialogTitle>
 
+
                 <DialogContent>
+
                     <Stack
+
                         spacing={2}
+
                         sx={{
+
                             mt: 1,
+
                             minWidth: 300
+
                         }}
+
                     >
-                        <TextField
-                            label="Serial Number"
-                            value={editFormValues.serial_number}
-                            onChange={handleEditFieldChange("serial_number")}
-                        />
 
                         <TextField
-                            label="Model"
-                            value={editFormValues.model}
-                            onChange={handleEditFieldChange("model")}
+                            disabled={role === "Field Technician"}
+                            label="Title"
+
+                            value={editFormValues.title}
+
+                            onChange={handleEditFieldChange("title")}
+
                         />
 
+
                         <TextField
+                            disabled={role === "Field Technician"}
                             select
-                            label="Status"
-                            value={editFormValues.status}
-                            onChange={handleEditFieldChange("status")}
+
+                            label="Priority"
+
+                            value={editFormValues.priority}
+
+                            onChange={handleEditFieldChange("priority")}
+
                         >
-                            {STATUS_OPTIONS.map((option) => (
+
+                            {PRIORITY_OPTIONS.map((option) => (
+
                                 <MenuItem
+
                                     key={option}
+
                                     value={option}
+
                                 >
+
                                     {option}
+
                                 </MenuItem>
+
                             ))}
+
                         </TextField>
 
-                        <TextField
-                            label="Charge Level (%)"
-                            type="number"
-                            value={editFormValues.charge_level}
-                            onChange={handleEditFieldChange("charge_level")}
-                        />
 
                         <TextField
-                            label="Hospital ID"
+
+                            select
+
+                            label="Status"
+
+                            value={editFormValues.status}
+
+                            onChange={handleEditFieldChange("status")}
+
+                        >
+
+                            {STATUS_OPTIONS.map((option) => (
+
+                                <MenuItem
+
+                                    key={option}
+
+                                    value={option}
+
+                                >
+
+                                    {option}
+
+                                </MenuItem>
+
+                            ))}
+
+                        </TextField>
+
+
+                        <TextField
+                            disabled={role === "Field Technician"}
+                            label="Equipment ID"
+
                             type="number"
-                            value={editFormValues.hospital_id}
-                            onChange={handleEditFieldChange("hospital_id")}
+
+                            value={editFormValues.equipment_id}
+
+                            onChange={handleEditFieldChange("equipment_id")}
+
                         />
+
+
+                        <TextField
+                            disabled={role === "Field Technician"}
+                            label="Technician ID"
+
+                            type="number"
+
+                            value={editFormValues.technician_id}
+
+                            onChange={handleEditFieldChange("technician_id")}
+
+                        />
+
                     </Stack>
+
                 </DialogContent>
 
+
                 <DialogActions>
-                    <Button
-                        variant="contained"
-                        color="error"
-                        onClick={() => setEditDialogOpen(false)}
-                    >
-                        Close
-                    </Button>
 
                     <Button
+
                         variant="contained"
-                        onClick={() => handleUpdate(selectedEquipment)}
+
+                        color="error"
+
+                        onClick={() =>
+                            setEditDialogOpen(false)
+                        }
+
                     >
-                        Update
+
+                        Close
+
                     </Button>
+
+
+                    <Button
+
+                        variant="contained"
+
+                        onClick={() =>
+                            handleUpdate(selectedWorkOrder)
+                        }
+
+                    >
+
+                        Update
+
+                    </Button>
+
                 </DialogActions>
+
             </Dialog>
 
         </Box>
+
     );
+
 }
 
-export default EquipmentDataGrid;
+
+export default WorkOrderDataGrid;

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict, Field
-
+from datetime import datetime
 class ServiceReportBase(BaseModel):
     work_order_id: int
     file_url: str = Field(min_length=1)
@@ -10,6 +10,7 @@ class ServiceReportCreate(ServiceReportBase):
 
 class ServiceReportRead(ServiceReportBase):
     id: int
+    created_at: datetime
     model_config = ConfigDict(from_attributes=True)
     
 class ServiceReportUpdate(ServiceReportBase):

@@ -31,7 +31,7 @@ export function AuthProvider({children}){
         setToken(null)
     }
 
-    const value = {token, user, isAuthenticated: Boolean(token), login, logout}
+    const value = {token, user, isAuthenticated: Boolean(token), login, logout, role: user?.role}
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

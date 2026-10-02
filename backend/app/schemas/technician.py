@@ -2,7 +2,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class TechnicianBase(BaseModel):
     name: str = Field(min_length=1, max_length=100)
-    branch_id: int
+    hospital_id: int
 
 class TechnicianCreate(TechnicianBase):
     pass
@@ -14,4 +14,4 @@ class TechnicianRead(TechnicianBase):
 class TechnicianUpdate(TechnicianBase):
     name: str | None = Field(default=None, min_length=1, max_length=100)
     
-    branch_id: int | None = None
+    hospital_id: int | None = None
