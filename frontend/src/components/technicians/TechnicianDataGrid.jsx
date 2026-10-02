@@ -162,7 +162,7 @@ function TechnicianDataGrid({ onSuccess }) {
                 <Button variant="outlined" sx={{ mb: 2 }} onClick={() => setDialogOpen(true)}>Add Technician</Button>
             )}
 
-            <Box sx={{height:"100%", width: "100%" }}>
+            <Box sx={{ height: 500, width: "100%" }}>
             <DataGrid  hideFooter rows={technicians} columns={columns} getRowId={(row) => row.id}/>
             </Box>
 
