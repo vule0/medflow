@@ -3,16 +3,17 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies import get_db
+from app.dependencies import get_db, require_role, get_current_user
 from app.schemas.service_report import ServiceReportCreate, ServiceReportRead, ServiceReportUpdate
-from app.models import ServiceReport
+from app.models import ServiceReport, UserRole, User
 
 router = APIRouter(prefix="/service_reports", tags=["service_reports"])
 
 
 
 @router.get("", response_model=list[ServiceReportRead])
-async def get_service_reports(db: AsyncSession = Depends(get_db)) -> list[ServiceReport]:
+async def get_service_reports(db: AsyncSession = Depends(get_db),
+                              _: User = Depends(get_current_user)) -> list[ServiceReport]:
 
     statement = select(ServiceReport).order_by(ServiceReport.id)
     results = await db.execute(statement)
@@ -22,7 +23,8 @@ async def get_service_reports(db: AsyncSession = Depends(get_db)) -> list[Servic
 
 @router.get("/{service_report_id}", response_model=ServiceReportRead)
 async def find_service_report(service_report_id: int,
-                              db: AsyncSession = Depends(get_db)) -> ServiceReport:
+                              db: AsyncSession = Depends(get_db),
+                              _: User = Depends(get_current_user)) -> ServiceReport:
 
     service_report = await db.get(ServiceReport, service_report_id)
     if service_report is None:
@@ -36,7 +38,8 @@ async def find_service_report(service_report_id: int,
 
 @router.post("", response_model=ServiceReportRead)
 async def create_service_report(payload: ServiceReportCreate,
-                                db: AsyncSession = Depends(get_db)) -> ServiceReport:
+                                db: AsyncSession = Depends(get_db),
+                                _: User = Depends(require_role(UserRole.CLINICAL_ADMIN, UserRole.FIELD_TECHNICIAN))) -> ServiceReport:
 
     service_report = ServiceReport(**payload.model_dump())
 
@@ -49,7 +52,8 @@ async def create_service_report(payload: ServiceReportCreate,
 
 @router.delete("/{service_report_id}")
 async def delete_service_report(service_report_id: int,
-                                db: AsyncSession = Depends(get_db)):
+                                db: AsyncSession = Depends(get_db),
+                                _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))):
 
     service_report = await db.get(ServiceReport,service_report_id)
 
@@ -66,7 +70,8 @@ async def delete_service_report(service_report_id: int,
 @router.patch("/{service_report_id}", response_model=ServiceReportRead)
 async def update_service_report(service_report_id: int,
                                 payload: ServiceReportUpdate,
-                                db: AsyncSession = Depends(get_db)):
+                                db: AsyncSession = Depends(get_db),
+                                _: User = Depends(require_role(UserRole.CLINICAL_ADMIN, UserRole.FIELD_TECHNICIAN))):
 
     service_report = await db.get(ServiceReport,service_report_id)
 

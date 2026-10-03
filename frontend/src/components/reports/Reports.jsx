@@ -9,6 +9,7 @@ import {
     Stack,
     TextField,
     Typography,
+    InputAdornment
 } from "@mui/material";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -71,8 +72,7 @@ function Reports() {
                 mt: 4,
             }}
         >
-            {/* Low Charge Equipment */}
-            <Accordion>
+            <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography variant="subtitle1">
                         Low Charge Equipment
@@ -101,6 +101,9 @@ function Reports() {
                                     min: 0,
                                     max: 100,
                                 },
+                                input: {
+            endAdornment: <InputAdornment position="end">%</InputAdornment>,
+        },
                             }}
                         />
                     </Stack>
@@ -114,8 +117,8 @@ function Reports() {
                     </Grid>
                 </AccordionDetails>
             </Accordion>
-                         {/* Discrepancies */}
-            <Accordion>
+
+            <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography variant="subtitle1">
                         Co-Location Discrepancies
@@ -126,14 +129,14 @@ function Reports() {
                     <DiscrepancyDataGrid />
                 </AccordionDetails>
             </Accordion>
-            {/* Reliability Metrics */}
-            <Accordion>
+
+
+            <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography variant="subtitle1">
                         Reliability Metrics
                     </Typography>
                 </AccordionSummary>
-
                 <AccordionDetails>
                     <Grid container spacing={2}>
                         {reliabilityMetrics.map((metric) => (
@@ -146,8 +149,7 @@ function Reports() {
             </Accordion>
 
            
-            {/* Hospital Maintenance */}
-            <Accordion>
+            <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography variant="subtitle1">
                         Hospital Maintenance
@@ -167,8 +169,8 @@ function Reports() {
                 </AccordionDetails>
             </Accordion>
 
-            {/* Supervisor Lookup */}
-            <Accordion>
+
+            <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography variant="subtitle1">
                         Supervisor Lookup

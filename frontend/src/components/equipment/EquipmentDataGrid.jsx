@@ -144,7 +144,7 @@ function EquipmentDataGrid({ onSuccess }) {
             );
 
             onSuccess(
-                `Equipment ${equipment.id} deleted successfully`
+                `Equipment ${equipment.serial_number} deleted successfully`
             );
 
             await fetchEquipment();
@@ -170,7 +170,7 @@ function EquipmentDataGrid({ onSuccess }) {
             setEditDialogOpen(false);
 
             onSuccess(
-                `Equipment ${equipment.id} updated successfully`
+                `Equipment ${equipment.serial_number} updated successfully`
             );
 
             await fetchEquipment();
@@ -276,7 +276,6 @@ function EquipmentDataGrid({ onSuccess }) {
                 />
             </Box>
 
-            {/* Create Equipment Dialog */}
             <Dialog
                 open={dialogOpen}
                 onClose={() => setDialogOpen(false)}
@@ -360,7 +359,6 @@ function EquipmentDataGrid({ onSuccess }) {
                 </DialogActions>
             </Dialog>
 
-            {/* Edit Equipment Dialog */}
             <Dialog
                 open={editDialogOpen}
                 onClose={() => setEditDialogOpen(false)}

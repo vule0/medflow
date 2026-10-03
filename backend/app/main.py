@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import hospitals, equipments, work_orders, service_reports, auth, reports, technicians
+from app.routers import hospitals, equipments, work_orders, service_reports, auth, reports, technicians,users
 from app.config import settings
 app = FastAPI(
     title="Medflow",
@@ -25,3 +25,4 @@ app.include_router(service_reports.router)
 app.include_router(auth.router)
 app.include_router(reports.router)
 app.include_router(technicians.router)
+app.include_router(users.router)

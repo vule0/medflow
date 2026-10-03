@@ -21,7 +21,8 @@ async def get_technicians(db: AsyncSession = Depends(get_db),
 
 @router.get("/{technician_id}", response_model=TechnicianRead)
 async def find_technician(technician_id: int,
-                          db: AsyncSession = Depends(get_db)) -> Technician:
+                          db: AsyncSession = Depends(get_db),
+                          _: User = Depends(get_current_user)) -> Technician:
     res = await db.get(Technician, technician_id)
     
     if res is None:

@@ -19,6 +19,7 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import BuildCircleIcon from "@mui/icons-material/BuildCircle";
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import BadgeIcon from '@mui/icons-material/Badge';
+import GroupIcon from '@mui/icons-material/Group';
 
 import EquipmentDataGrid from "../equipment/EquipmentDataGrid";
 import HospitalDataGrid from "../hospital/HospitalDataGrid";
@@ -26,6 +27,7 @@ import WorkOrderDataGrid from "../work_order/WorkOrderDataGrid";
 import ServiceReportDataGrid from "../service_report/ServiceReportDataGrid";
 import Reports from "../reports/Reports";
 import TechnicianDataGrid from "../technicians/TechnicianDataGrid";
+import UserDataGrid from "../users/UserDataGrid";
 import { useAuth } from "../../context/AuthContext";
 
 const drawerWidth = 240;
@@ -42,7 +44,6 @@ function Dashboard() {
         value: "reports",
         icon: <AssessmentIcon/>
     },
-
     {
         label: "Equipment",
         value: "equipment",
@@ -71,7 +72,16 @@ function Dashboard() {
             icon: <BadgeIcon/>
         }
 
-    ] : [])
+    ] : []),
+    ...(role === "Clinical Admin" ? [
+        {
+            label: "Users",
+            value: "users",
+            icon: <GroupIcon/>
+
+        }
+    ]: []),
+
 ];
     const renderContent = () => {
         switch (selectedPage) {
@@ -91,6 +101,9 @@ function Dashboard() {
 
             case "technicians":
                 return <TechnicianDataGrid onSuccess={setNotification}/>
+            
+            case "users":
+                return <UserDataGrid onSuccess={setNotification}/>
             default:
                 return <EquipmentDataGrid />;
         }
@@ -104,7 +117,6 @@ function Dashboard() {
                 marginTop: `${headerHeight}px`,
             }}
         >
-            {/* Drawer */}
             <Drawer
                 variant="permanent"
                 sx={{
@@ -139,7 +151,6 @@ function Dashboard() {
                 </List>
             </Drawer>
 
-            {/* Main Content */}
             <Box
                 component="main"
                 sx={{

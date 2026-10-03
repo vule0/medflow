@@ -3,15 +3,16 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies import get_db
+from app.dependencies import get_db, get_current_user, require_role
 from app.schemas.work_order import WorkOrderCreate, WorkOrderRead, WorkOrderUpdate, DiscrepancyRead
-from app.models import WorkOrder, WorkOrderStatus, WorkOrderPriority, Hospital, Technician, Equipment
+from app.models import WorkOrder, WorkOrderStatus, WorkOrderPriority, Hospital, Technician, Equipment, User, UserRole
 
 router = APIRouter(prefix="/work_orders", tags=["work_orders"])
 
 @router.get("/discrepancies", response_model=list[DiscrepancyRead])
 async def get_discrepancies(priority: WorkOrderPriority | None = Query(default=None),
-                            db: AsyncSession = Depends(get_db)):
+                            db: AsyncSession = Depends(get_db),
+                            _: User = Depends(get_current_user)):
     statement = (select(WorkOrder.id.label("work_order_id"),
                        WorkOrder.title,
                        Equipment.hospital_id.label("equipment_hospital_id"),
@@ -29,7 +30,8 @@ async def get_discrepancies(priority: WorkOrderPriority | None = Query(default=N
     return list(results.mappings().all())
 
 @router.get("", response_model=list[WorkOrderRead])
-async def get_work_orders(db: AsyncSession = Depends(get_db)) -> list[WorkOrder]:
+async def get_work_orders(db: AsyncSession = Depends(get_db),
+                          _: User = Depends(get_current_user)) -> list[WorkOrder]:
     statement = select(WorkOrder).order_by(WorkOrder.id)
     results = await db.execute(statement)
     
@@ -51,7 +53,8 @@ async def find_word_order(work_order_id: int,
 
 @router.post("", response_model=WorkOrderRead)
 async def create_work_order(payload: WorkOrderCreate,
-                            db: AsyncSession = Depends(get_db)) -> WorkOrder:
+                            db: AsyncSession = Depends(get_db),
+                            _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))) -> WorkOrder:
     work_order = WorkOrder(**payload.model_dump())
     
     db.add(work_order)
@@ -62,7 +65,8 @@ async def create_work_order(payload: WorkOrderCreate,
 
 @router.delete("/{work_order_id}")
 async def delete_work_order(work_order_id: int,
-                            db: AsyncSession = Depends(get_db)):
+                            db: AsyncSession = Depends(get_db),
+                            _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))):
     work_order = await db.get(WorkOrder, work_order_id)
         
     if work_order is None:
@@ -77,7 +81,8 @@ async def delete_work_order(work_order_id: int,
 @router.patch("/{work_order_id}", response_model=WorkOrderRead)
 async def update_work_order(work_order_id: int,
                             payload: WorkOrderUpdate,
-                            db: AsyncSession = Depends(get_db)) -> WorkOrder:
+                            db: AsyncSession = Depends(get_db),
+                            _: User = Depends(require_role(UserRole.CLINICAL_ADMIN, UserRole.FIELD_TECHNICIAN))) -> WorkOrder:
     work_order = await db.get(WorkOrder, work_order_id)
             
     if work_order is None:

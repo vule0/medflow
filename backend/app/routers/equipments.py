@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies import get_db, get_current_user
-from app.models import Equipment, User
+from app.dependencies import get_db, get_current_user, require_role
+from app.models import Equipment, User, UserRole
 from app.schemas.equipment import EquipmentCreate, EquipmentRead, EquipmentUpdate
 
 router = APIRouter(prefix="/equipments", tags=["equipments"])
@@ -19,7 +19,8 @@ async def get_equipment(db: AsyncSession = Depends(get_db),
 
 @router.get("/{equipment_id}", response_model=EquipmentRead)
 async def find_equipment(equipment_id: int,
-                         db: AsyncSession = Depends(get_db)) -> Equipment:
+                         db: AsyncSession = Depends(get_db),
+                         _: User = Depends(get_current_user)) -> Equipment:
     equipment = await db.get(Equipment, equipment_id)
     if equipment is None:
         raise HTTPException(
@@ -31,7 +32,8 @@ async def find_equipment(equipment_id: int,
 
 @router.post("", response_model=EquipmentRead)
 async def create_equipment(payload: EquipmentCreate,
-                           db: AsyncSession = Depends(get_db)) -> Equipment:
+                           db: AsyncSession = Depends(get_db),
+                           _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))) -> Equipment:
     
     equipment = Equipment(**payload.model_dump())
     
@@ -42,7 +44,8 @@ async def create_equipment(payload: EquipmentCreate,
 
 @router.delete("/{equipment_id}")
 async def delete_equipment(equipment_id: int,
-                           db: AsyncSession = Depends(get_db)):
+                           db: AsyncSession = Depends(get_db),
+                           _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))):
     equipment = await db.get(Equipment, equipment_id)
     if equipment is None:
         raise HTTPException(
@@ -55,7 +58,8 @@ async def delete_equipment(equipment_id: int,
 @router.patch("/{equipment_id}", response_model=EquipmentRead)
 async def update_equipment(equipment_id: int,
                            payload: EquipmentUpdate,
-                           db: AsyncSession = Depends(get_db)):
+                           db: AsyncSession = Depends(get_db),
+                           _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))):
     equipment = await db.get(Equipment, equipment_id)
     if equipment is None:
         raise HTTPException(

@@ -27,3 +27,25 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(),
     access_token = create_access_token(data={"sub": user.username, "role": user.role.value})
     return Token(access_token=access_token, token_type="bearer")
 
+
+@router.post("/register", response_model=UserRead)
+async def register_user(payload: UserCreate,
+                        db: AsyncSession = Depends(get_db), 
+                        _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))) -> User:
+    existing = await db.execute(select(User).where(func.lower(User.username) == payload.username.lower()))
+    if existing.scalar_one_or_none() is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Username {payload.username} already exists"
+        )    
+        
+    user = User(
+        username = payload.username,
+        hashed_password = hash_password(payload.password), 
+        role = payload.role
+    )
+    
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
