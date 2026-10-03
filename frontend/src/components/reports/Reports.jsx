@@ -72,7 +72,7 @@ function Reports() {
                 mt: 4,
             }}
         >
-            <Accordion defaultExpanded>
+            <Accordion defaultExpanded sx={{ mb: 1 }}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography variant="subtitle1">
                         Low Charge Equipment
@@ -102,15 +102,15 @@ function Reports() {
                                     max: 100,
                                 },
                                 input: {
-            endAdornment: <InputAdornment position="end">%</InputAdornment>,
-        },
+                                    endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                },
                             }}
                         />
                     </Stack>
 
                     <Grid container spacing={2}>
                         {lowChargeEquipment.map((equipment) => (
-                            <Grid key={equipment.id}>
+                            <Grid size={3} key={equipment.id}>
                                 <LowChargeCard equipment={equipment} />
                             </Grid>
                         ))}
@@ -118,7 +118,7 @@ function Reports() {
                 </AccordionDetails>
             </Accordion>
 
-            <Accordion defaultExpanded>
+            <Accordion defaultExpanded sx={{ mb: 1 }}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography variant="subtitle1">
                         Co-Location Discrepancies
@@ -131,16 +131,27 @@ function Reports() {
             </Accordion>
 
 
-            <Accordion defaultExpanded>
+            <Accordion defaultExpanded sx={{ mb: 1 }}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography variant="subtitle1">
                         Reliability Metrics
                     </Typography>
+
                 </AccordionSummary>
-                <AccordionDetails>
+                <AccordionDetails variant="body2"
+                    color="text.secondary"
+                    sx={{
+                        mt: 0,
+                        mb: 2,
+                        textAlign: "left",
+
+                    }}
+                >
+                    <Typography sx={{ mb: 3 }}> Displays the number of completed, open, and failed work orders
+                        for each equipment model.</Typography>
                     <Grid container spacing={2}>
                         {reliabilityMetrics.map((metric) => (
-                            <Grid key={metric.equipment_model}>
+                            <Grid size={4} key={metric.equipment_model}>
                                 <ReliabilityMetricsCard metric={metric} />
                             </Grid>
                         ))}
@@ -148,40 +159,42 @@ function Reports() {
                 </AccordionDetails>
             </Accordion>
 
-           
-            <Accordion defaultExpanded>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="subtitle1">
-                        Hospital Maintenance
-                    </Typography>
-                </AccordionSummary>
+            <Grid container spacing={2}>
+                <Grid size={7}>
+                    <Accordion defaultExpanded sx={{ mb: 1 }}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography variant="subtitle1">
+                                Hospital Maintenance
+                            </Typography>
+                        </AccordionSummary>
 
-                <AccordionDetails>
-                    <Grid container spacing={2}>
-                        {maintenanceHospitals.map((hospital) => (
-                            <Grid key={hospital.hospital_id}>
-                                <HospitalMaintenanceCard
-                                    hospital={hospital}
-                                />
+                        <AccordionDetails>
+                            <Grid container spacing={2}>
+                                {maintenanceHospitals.map((hospital) => (
+                                    <Grid key={hospital.hospital_id}>
+                                        <HospitalMaintenanceCard
+                                            hospital={hospital}
+                                        />
+                                    </Grid>
+                                ))}
                             </Grid>
-                        ))}
-                    </Grid>
-                </AccordionDetails>
-            </Accordion>
+                        </AccordionDetails>
+                    </Accordion>
+                </Grid>
+                <Grid size={5}>
+                    <Accordion defaultExpanded sx={{ mb: 1 }}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography variant="subtitle1">
+                                Supervisor Lookup
+                            </Typography>
+                        </AccordionSummary>
 
-
-            <Accordion defaultExpanded>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="subtitle1">
-                        Supervisor Lookup
-                    </Typography>
-                </AccordionSummary>
-
-                <AccordionDetails>
-                    <SupervisorLines />
-                </AccordionDetails>
-            </Accordion>
-
+                        <AccordionDetails>
+                            <SupervisorLines />
+                        </AccordionDetails>
+                    </Accordion>
+                </Grid>
+            </Grid>
             {error && (
                 <Typography color="error" sx={{ mt: 2 }}>
                     {error}

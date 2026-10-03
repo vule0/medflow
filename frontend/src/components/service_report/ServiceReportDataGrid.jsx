@@ -238,7 +238,6 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
                 )}
             </Box>
 
-            {/* Create Dialog */}
             <Dialog
                 open={dialogOpen}
                 onClose={() => setDialogOpen(false)}
@@ -296,7 +295,6 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
                 </DialogActions>
             </Dialog>
 
-            {/* Edit Dialog */}
             <Dialog
                 open={editDialogOpen}
                 onClose={() => setEditDialogOpen(false)}

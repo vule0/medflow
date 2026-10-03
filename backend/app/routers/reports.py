@@ -53,6 +53,15 @@ async def get_reliability_metrics(
             ).label("completed_work_orders"),
             func.sum(
                 case(
+                    (
+                        WorkOrder.status.in_([
+                            WorkOrderStatus.PENDING,
+                            WorkOrderStatus.IN_PROGRESS,]), 1),
+                    else_=0,
+                )
+            ).label("incomplete_work_orders"),
+            func.sum(
+                case(
                     (WorkOrder.status == WorkOrderStatus.FAILED, 1),
                     else_=0,
                 )

@@ -113,12 +113,12 @@ function Dashboard() {
         <Box
             sx={{
                 display: "flex",
-                height: "calc(100vh - 64x)",
+                height: "calc(100vh - 64px)",
                 marginTop: `${headerHeight}px`,
             }}
         >
             <Drawer
-                variant="permanent"
+            variant="permanent"
                 sx={{
                     width: drawerWidth,
                     flexShrink: 0,
