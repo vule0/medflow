@@ -79,17 +79,18 @@ function Reports() {
                     </Typography>
                 </AccordionSummary>
 
-                <AccordionDetails>
+                <AccordionDetails sx={{mb:2}}>
+                
                     <Stack
-                        direction="row"
+                        // direction="row"
+                        spacing={3}
                         sx={{
-                            justifyContent: "left",
                             mb: 3,
                         }}
                     >
                         <TextField
-                            sx={{ width: 160 }}
-                            label="Charge Threshold"
+                            sx={{ width: 160}}
+                            label="Battery"
                             type="number"
                             size="small"
                             value={chargeThreshold}
@@ -97,15 +98,12 @@ function Reports() {
                                 setChargeThreshold(event.target.value)
                             }
                             slotProps={{
-                                htmlInput: {
-                                    min: 0,
-                                    max: 100,
-                                },
                                 input: {
                                     endAdornment: <InputAdornment position="end">%</InputAdornment>,
                                 },
                             }}
                         />
+                         {chargeThreshold && (<Typography sx={{ mb: 3, pl: 1, textAlign:"left" }}>{lowChargeEquipment.length} pieces of equipment below {chargeThreshold}%</Typography>)}
                     </Stack>
 
                     <Grid container spacing={2}>
@@ -125,7 +123,8 @@ function Reports() {
                     </Typography>
                 </AccordionSummary>
 
-                <AccordionDetails>
+                <AccordionDetails sx={{mb: 2}}>
+                     {/* <Typography sx={{ mb: 3, textAlign: "left" }}>Work orders where the assigned technician is located at a different hospital than the equipment.</Typography> */}
                     <DiscrepancyDataGrid />
                 </AccordionDetails>
             </Accordion>
@@ -141,14 +140,12 @@ function Reports() {
                 <AccordionDetails variant="body2"
                     color="text.secondary"
                     sx={{
-                        mt: 0,
                         mb: 2,
                         textAlign: "left",
 
                     }}
                 >
-                    <Typography sx={{ mb: 3 }}> Displays the number of completed, open, and failed work orders
-                        for each equipment model.</Typography>
+                    {/* <Typography sx={{ mb: 3 }}> Displays the number of completed, open, and failed work orders for each equipment model.</Typography> */}
                     <Grid container spacing={2}>
                         {reliabilityMetrics.map((metric) => (
                             <Grid size={4} key={metric.equipment_model}>
@@ -171,7 +168,7 @@ function Reports() {
                         <AccordionDetails>
                             <Grid container spacing={2}>
                                 {maintenanceHospitals.map((hospital) => (
-                                    <Grid key={hospital.hospital_id}>
+                                    <Grid size={6} key={hospital.hospital_id}>
                                         <HospitalMaintenanceCard
                                             hospital={hospital}
                                         />

@@ -15,7 +15,9 @@ import {
     DialogTitle,
     MenuItem,
     Stack,
-    TextField
+    TextField,
+    Typography, 
+    LinearProgress
 } from "@mui/material";
 
 import EditIcon from "@mui/icons-material/Edit";
@@ -26,7 +28,6 @@ import { useAuth } from "../../context/AuthContext";
 
 function EquipmentDataGrid({ onSuccess }) {
     const { user, role } = useAuth();
-
     const STATUS_OPTIONS = [
         "Available",
         "In-Use",
@@ -63,7 +64,9 @@ function EquipmentDataGrid({ onSuccess }) {
         setLoading(true);
 
         try {
-            const response = await apiClient.get("/equipments");
+
+            const endpoint = role == "Field Technician" ? `/equipments/hospital/${user.id}` : "/equipments"
+            const response = await apiClient.get(endpoint);
 
             setEquipment(response.data);
             setError(null);
@@ -150,7 +153,6 @@ function EquipmentDataGrid({ onSuccess }) {
             await fetchEquipment();
         } catch (error) {
             setError(
-                error.response?.data?.detail ||
                 "Could not delete equipment. Please try again later"
             );
         }
@@ -191,24 +193,64 @@ function EquipmentDataGrid({ onSuccess }) {
         {
             field: "serial_number",
             headerName: "Serial Number",
-            flex: 1
+            flex: .9
         },
         {
             field: "model",
             headerName: "Model",
-            flex: 1
+            flex: 1.1
         },
         {
             field: "status",
             headerName: "Status",
-            flex: 0.8
+            flex: 0.7
         },
+        // {
+        //     field: "charge_level",
+        //     headerName: "Charge Level (%)",
+        //     flex: .7,
+        //     type: "number"
+        // },
         {
-            field: "charge_level",
-            headerName: "Charge Level (%)",
-            flex: .7,
-            type: "number"
-        },
+    field: "charge_level",
+    headerName: "Battery",
+    flex: .7,
+    renderCell: (params) => {
+        const value = Math.round(params.value)
+        const color = value <= 20 ? "error" : value < 50 ? "warning" : "success"
+
+        return (
+            <Box
+                sx={{
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                }}
+            >
+                <LinearProgress
+                    variant="determinate"
+                    value={value}
+                    color={color}
+                    sx={{
+                        flexGrow: 1,
+                        height: 10,
+                        borderRadius: 5,
+                        backgroundColor: "grey.200",
+                        "& .MuiLinearProgress-bar": {
+                            borderRadius: 5,
+                        },
+                    }}
+                />
+
+                <Typography variant="body2" sx={{
+                        minWidth: 38,
+                        textAlign: "right",}}>{value}%</Typography>
+            </Box>
+        );
+    },
+},
         {
             field: "hospital_id",
             headerName: "Hospital ID",
@@ -250,12 +292,18 @@ function EquipmentDataGrid({ onSuccess }) {
             <Alert severity="error">
                 {error}
             </Alert>
+
         );
     }
 
     return (
         <Box sx={{ width: "100%" }}>
-
+            {error && (
+            <Alert severity="error">
+                {error}
+            </Alert>
+            
+        )}
             {role === "Clinical Admin" && (
                 <Button
                     variant="outlined"

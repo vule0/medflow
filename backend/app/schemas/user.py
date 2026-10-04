@@ -2,6 +2,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from app.models import UserRole
 
 class UserBase(BaseModel):
+    # id: int
     username: str = Field(min_length=3, max_length=50)
     role: UserRole
     

@@ -23,7 +23,6 @@ function LoginForm() {
             } else {
                 setError("Something went wrong. Please try again shortly.")
             }
-
         }
     };
 

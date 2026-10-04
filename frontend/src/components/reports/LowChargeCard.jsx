@@ -3,25 +3,17 @@ import { Card, CardContent, Typography, Chip, Stack, Divider } from '@mui/materi
 
 
 function LowChargeCard({ equipment }) {
-
+  const color = equipment.charge_level <= 20 ? "error" : equipment.charge_level < 50 ? "warning" : "success"
   return (
-    <Card variant="outlined" sx={{
-        width: "100%",
-        borderRadius: 2,
-        transition: "0.2s",
-        "&:hover": {
-          boxShadow: 2,
-          transform: "translateY(-2px)",
-        },
-      }}>
+    <Card variant="outlined" >
       <CardContent> 
-        <Typography variant="subtitle1">{equipment.serial_number}
+        <Typography noWrap variant="subtitle1">{equipment.serial_number}
         </Typography>
         <Typography color="text.secondary" gutterBottom>{equipment.model}
         </Typography>
         <Divider sx={{ mb: 1.5 }} />
         <Stack direction="row" spacing={1} sx={{alignItems:"center", justifyContent: "center"}} >
-          <Chip label={`${equipment.charge_level}%`} color="error" />
+          <Chip label={`${equipment.charge_level}%`} color={color} />
           <Chip label={equipment.status} />
         </Stack>
       </CardContent>

@@ -138,6 +138,13 @@ function Dashboard() {
                             key={item.value}
                             selected={selectedPage === item.value}
                             onClick={() => setSelectedPage(item.value)}
+                            sx={{
+
+    "&.Mui-selected": {
+      backgroundColor: "rgba(20, 150, 127, 0.12)",
+
+    },
+  }}
                         >
                             <ListItemIcon>
                                 {item.icon}

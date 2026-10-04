@@ -16,7 +16,8 @@ import {
     DialogTitle,
     MenuItem,
     Stack,
-    TextField
+    TextField,
+    Chip
 } from "@mui/material";
 
 import EditIcon from "@mui/icons-material/Edit";
@@ -24,6 +25,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 import apiClient from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
+import { render } from "@testing-library/react";
 
 
 function WorkOrderDataGrid({ onSuccess = () => { } }) {
@@ -196,15 +198,37 @@ function WorkOrderDataGrid({ onSuccess = () => { } }) {
             headerName: "Title",
             flex: 1.5
         },
-        {
+        // {
+        //     field: "priority",
+        //     headerName: "Priority",
+        //     flex: 0.8
+        // },
+        { 
             field: "priority",
             headerName: "Priority",
-            flex: 0.8
+            flex: 0.8,
+            renderCell: (params) => {
+                const color = params.value == "Critical" ? "error" : params.value == "Medium" ? "warning" : ""
+
+                return <Chip label={params.value} color={color}/>
+            }
         },
+
+        // {
+        //     field: "status",
+        //     headerName: "Status",
+        //     flex: 1
+        // },
         {
             field: "status",
             headerName: "Status",
-            flex: 1
+            flex: 1,
+            renderCell: (params) => {
+                const color = params.value == "Completed" ? "success" : params.value == "Failed" ? "error" : params.value == "Pending" ? "warning" : ""
+                return(
+                    <Chip variant={color == "error" || color == "success"? "filled" : "outlined"}label={params.value} color={color}/>
+                )
+            }
         },
         {
             field: "equipment_id",

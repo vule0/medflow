@@ -10,27 +10,14 @@ import {
 
 function ReliabilityMetricsCard({ metric }) {
   return (
-    <Card
-      variant="outlined"
-      sx={{
-        width: "100%",
-        borderRadius: 2,
-        transition: "0.2s",
-        "&:hover": {
-          boxShadow: 2,
-          transform: "translateY(-2px)",
-        },
-      }}
-    >
+    <Card variant="outlined">
       <CardContent sx={{ p: 2 }}>
         <Typography
           variant="subtitle2"
           sx={{
             mb: 1.5,
           }}
-        >
-          {metric.equipment_model}
-        </Typography>
+        >{metric.equipment_model}</Typography>
 
         <Divider sx={{ mb: 1.5 }} />
 
@@ -42,15 +29,13 @@ function ReliabilityMetricsCard({ metric }) {
               alignItems: "center",
             }}
           >
-            <Typography variant="body2" color="text.secondary">
-              Completed
-            </Typography>
+            <Typography variant="body2" color="text.secondary">Completed</Typography>
 
             <Chip
               label={metric.completed_work_orders}
               color="success"
-              size="small"
-            />
+              size="small"/>
+
           </Box>
 
           <Box
@@ -60,15 +45,12 @@ function ReliabilityMetricsCard({ metric }) {
               alignItems: "center",
             }}
           >
-            <Typography variant="body2" color="text.secondary">
-              Active
-            </Typography>
+            <Typography variant="body2" color="text.secondary">Active</Typography>
 
             <Chip
               label={metric.incomplete_work_orders}
               // color="warning"
-              size="small"
-            />
+              size="small"/>
           </Box>
 
           <Box
@@ -78,15 +60,12 @@ function ReliabilityMetricsCard({ metric }) {
               alignItems: "center",
             }}
           >
-            <Typography variant="body2" color="text.secondary">
-              Failed
-            </Typography>
+            <Typography variant="body2" color="text.secondary">Failed</Typography>
 
             <Chip
               label={metric.failed_work_orders}
               color="error"
-              size="small"
-            />
+              size="small"/>
           </Box>
         </Stack>
       </CardContent>

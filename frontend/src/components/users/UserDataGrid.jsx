@@ -21,7 +21,7 @@ import { useAuth } from "../../context/AuthContext";
 function UserDataGrid({ onSuccess }) {
   const { role } = useAuth();
 
-  const ROLE_OPTIONS = [
+const ROLE_OPTIONS = [
     "Clinical Admin",
     "Field Technician",
     "Auditor"

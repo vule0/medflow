@@ -11,7 +11,12 @@ function AppHeader() {
         >
             <Toolbar>
                 <MonitorHeartIcon sx={{mr: 2}}/>
-                <Typography variant="h6" component="h1">
+                <Typography variant="h6" component="h1"
+                  sx={{
+    fontWeight: 700,
+    letterSpacing: "-0.3px",
+  }}
+                >
                    MedFlow Clinical Equipment Command Center
                 </Typography>
                 {username && (
