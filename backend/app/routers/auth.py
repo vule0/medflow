@@ -28,7 +28,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(),
     return Token(access_token=access_token, token_type="bearer")
 
 
-@router.post("/register", response_model=UserRead)
+@router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def register_user(payload: UserCreate,
                         db: AsyncSession = Depends(get_db), 
                         _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))) -> User:

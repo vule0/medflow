@@ -7,13 +7,10 @@ from sqlalchemy.pool import NullPool
 
 from app.dependencies import get_db
 from app.main import app
-from app.models import Base, User, UserRole
+from app.models import Base, User, UserRole, Hospital
 from app.security import create_access_token, hash_password
 
-TEST_DATABASE_URL = os.environ.get(
-    "TEST_DATABASE_URL",
-    "postgresql+asyncpg://postgres:2003@127.0.0.1:5432/medflow"
-)
+TEST_DATABASE_URL = "postgresql+asyncpg://postgres:2003@localhost:5432/medflow_test"
 
 test_engine = create_async_engine(TEST_DATABASE_URL, poolclass=NullPool)
 TestSessionLocal = async_sessionmaker(test_engine, expire_on_commit=False)
@@ -42,10 +39,19 @@ async def client(db_session):
     app.dependency_overrides.clear()
 
 @pytest_asyncio.fixture
+async def seeded_hospital(db_session):
+    hospital = Hospital(name="Test Hospital", location_region="Test Region", capacity=10, supervisor_id=1)
+    db_session.add(hospital)
+    await db_session.commit()
+    await db_session.refresh(hospital)
+    return hospital
+
+
+@pytest_asyncio.fixture
 async def seeded_users(db_session):
     users = {
         "admin" : User(username="test_admin", hashed_password=hash_password("pw"), role=UserRole.CLINICAL_ADMIN),
-        "operator" : User(username="test_operator", hashed_password=hash_password("pw"), role=UserRole.FIELD_OPERATOR),
+        "technician" : User(username="test_technician", hashed_password=hash_password("pw"), role=UserRole.FIELD_TECHNICIAN),
         "auditor" : User(username="test_auditor", hashed_password=hash_password("pw"), role=UserRole.AUDITOR),
     }
     for user in users.values():
@@ -54,3 +60,7 @@ async def seeded_users(db_session):
     for user in users.values():
        await db_session.refresh(user)
     return users
+
+def auth_header(user: User) -> dict[str, str]:
+    token = create_access_token(data={"sub": user.username, "role":user.role.value})
+    return {"Authorization" : f"Bearer {token}"}

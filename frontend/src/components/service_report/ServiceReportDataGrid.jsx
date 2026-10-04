@@ -15,6 +15,8 @@ import {
     DialogContent,
     DialogTitle,
     TextField,
+    Grid,
+    Link
 } from "@mui/material";
 
 import EditIcon from "@mui/icons-material/Edit";
@@ -35,16 +37,15 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
     const [editDialogOpen, setEditDialogOpen] = useState(false);
 
     const [selectedServiceReport, setSelectedServiceReport] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null)
 
     const [formValues, setFormValues] = useState({
         work_order_id: "",
-        file_url: "",
         notes: "",
     });
 
     const [editFormValues, setEditFormValues] = useState({
         work_order_id: "",
-        file_url: "",
         notes: "",
     });
 
@@ -88,11 +89,12 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
 
     const handleCreate = async () => {
         try {
-            await apiClient.post("/service_reports", {
-                work_order_id: Number(formValues.work_order_id),
-                file_url: formValues.file_url,
-                notes: formValues.notes,
-            });
+            const formData = new FormData();
+
+            formData.append("work_order_id", formValues.work_order_id)
+            formData.append("file", selectedFile)
+            formData.append("notes", formValues.notes)
+            await apiClient.post("/service_reports", formData);
 
             setDialogOpen(false);
 
@@ -102,10 +104,9 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
 
             setFormValues({
                 work_order_id: "",
-                file_url: "",
                 notes: "",
             });
-
+            setSelectedFile(null)
             await fetchServiceReports();
         } catch (err) {
             console.error(err);
@@ -115,23 +116,28 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
 
     const handleEdit = (serviceReport) => {
         setSelectedServiceReport(serviceReport);
-
         setEditFormValues({
             work_order_id: serviceReport.work_order_id ?? "",
-            file_url: serviceReport.file_url ?? "",
             notes: serviceReport.notes ?? "",
         });
 
         setEditDialogOpen(true);
     };
 
+    const handleFileChange = (event) => {
+        const file = event.target.files?.[0];
+        setSelectedFile(file);
+        setError(null);
+    };
+
+
     const handleUpdate = async (serviceReport) => {
         try {
-            await apiClient.patch(`/service_reports/${serviceReport.id}`, {
-                work_order_id: Number(editFormValues.work_order_id),
-                file_url: editFormValues.file_url,
-                notes: editFormValues.notes,
-            });
+            const formData = new FormData()
+            formData.append("work_order_id", editFormValues.work_order_id)
+            formData.append("file", selectedFile)
+            formData.append("notes", editFormValues.notes)
+            await apiClient.patch(`/service_reports/${serviceReport.id}`, formData);
 
             setEditDialogOpen(false);
 
@@ -164,7 +170,12 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
     const columns = [
         { field: 'id', headerName: 'ID', flex: .2 },
         { field: 'work_order_id', headerName: "Work Order ID", flex: .5, type: 'number' },
-        { field: 'file_url', headerName: 'File URL', flex: 1.5 },
+        {
+            field: 'file_url', headerName: 'File URL', flex: 1.5,
+            renderCell: (params) => {
+                return (<Link href={params.value} target="_blank" >{params.value}</Link>)
+            }
+        },
         { field: 'notes', headerName: 'Notes', flex: 1.5 },
         {
             field: 'created_at', headerName: 'Created At', flex: .7, type: 'dateTime',
@@ -196,7 +207,7 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
 
     return (
         <Box>
-            {(role === "Clinical Admin" || role === "Field Technician")&& (
+            {(role === "Clinical Admin" || role === "Field Technician") && (
                 <Button
                     variant="outlined"
                     sx={{ mb: 2 }}
@@ -216,7 +227,7 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
                 </Alert>
             )}
 
-            <Box sx={{ height: 500, width: "100%"}}>
+            <Box sx={{ height: 500, width: "100%" }}>
                 {loading ? (
                     <Box
                         sx={{
@@ -259,16 +270,6 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
                         value={formValues.work_order_id}
                         onChange={handleFieldChange}
                     />
-
-                    <TextField
-                        fullWidth
-                        margin="dense"
-                        label="File URL"
-                        name="file_url"
-                        value={formValues.file_url}
-                        onChange={handleFieldChange}
-                    />
-
                     <TextField
                         fullWidth
                         margin="dense"
@@ -279,6 +280,37 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
                         value={formValues.notes}
                         onChange={handleFieldChange}
                     />
+                    <Grid container spacing={2} sx={{ mt: 2, alignItems: "center", }}>
+                        <Grid size={{ xs: 12, sm: 4 }} sx={{ height: "100%" }}>
+                            <Button variant="outlined" component="label" fullWidth> Upload File
+
+                                <input
+                                    hidden
+                                    type="file"
+                                    accept=".pdf,application/pdf,.txt,text/plain"
+                                    onChange={handleFileChange}
+                                />
+                            </Button>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 8 }}>
+                            <TextField
+                                disabled
+                                fullWidth
+                                label="Selected File"
+                                value={selectedFile?.name || "None"}
+                            />
+                        </Grid>
+                    </Grid>
+                    {/* <TextField
+                        fullWidth
+                        margin="dense"
+                        label="File URL"
+                        name="file_url"
+                        value={formValues.file_url}
+                        onChange={handleFieldChange}
+                    /> */}
+
+
                 </DialogContent>
 
                 <DialogActions>
@@ -317,14 +349,14 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
                         onChange={handleEditFieldChange}
                     />
 
-                    <TextField
+                    {/* <TextField
                         fullWidth
                         margin="dense"
                         label="File URL"
                         name="file_url"
                         value={editFormValues.file_url}
                         onChange={handleEditFieldChange}
-                    />
+                    /> */}
 
                     <TextField
                         fullWidth
@@ -336,6 +368,27 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
                         value={editFormValues.notes}
                         onChange={handleEditFieldChange}
                     />
+                    <Grid container spacing={2} sx={{ mt: 2, alignItems: "center", }}>
+                        <Grid size={{ xs: 12, sm: 4 }} sx={{ height: "100%" }}>
+                            <Button variant="outlined" component="label" fullWidth> Upload File
+
+                                <input
+                                    hidden
+                                    type="file"
+                                    accept=".pdf,application/pdf,.txt,text/plain"
+                                    onChange={handleFileChange}
+                                />
+                            </Button>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 8 }}>
+                            <TextField
+                                disabled
+                                fullWidth
+                                label="Selected File"
+                                value={selectedFile?.name || "None"}
+                            />
+                        </Grid>
+                    </Grid>
                 </DialogContent>
 
                 <DialogActions>

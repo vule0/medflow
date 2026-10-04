@@ -186,7 +186,7 @@ function Reports() {
                             </Typography>
                         </AccordionSummary>
 
-                        <AccordionDetails>
+                        <AccordionDetails sx={{mb:2}}>
                             <SupervisorLines />
                         </AccordionDetails>
                     </Accordion>

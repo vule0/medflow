@@ -17,13 +17,13 @@ async def test_login_fails_with_wrong_password(client, seeded_users):
     assert response.status_code == 401
 
 
-async def test_register_requires_fleet_admin(client, seeded_users):
-    payload = {"username": "new_user", "password": "TestPass123!", "role": "Field Operator"}
+async def test_register_requires_admin(client, seeded_users):
+    payload = {"username": "new_user", "password": "TestPass123!", "role": "Field Technician"}
 
-    operator_response = await client.post(
-        "/auth/register", json=payload, headers=auth_header(seeded_users["operator"])
+    technician_response = await client.post(
+        "/auth/register", json=payload, headers=auth_header(seeded_users["technician"])
     )
-    assert operator_response.status_code == 403
+    assert technician_response.status_code == 403
 
     admin_response = await client.post(
         "/auth/register", json=payload, headers=auth_header(seeded_users["admin"])
@@ -32,6 +32,6 @@ async def test_register_requires_fleet_admin(client, seeded_users):
 
 
 async def test_register_rejects_case_insensitive_duplicate_username(client, seeded_users):
-    payload = {"username": "TEST_ADMIN", "password": "SomePass123!", "role": "Field Operator"}
+    payload = {"username": "TEST_ADMIN", "password": "SomePass123!", "role": "Field Technician"}
     response = await client.post("/auth/register", json=payload, headers=auth_header(seeded_users["admin"]))
     assert response.status_code == 400

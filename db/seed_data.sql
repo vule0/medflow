@@ -4,7 +4,7 @@ VALUES
 ('Riverside General Hospital', 'Orlando', 320, 1), 
 ('Gulf Coast Regional Hospital', 'Fort Myers', 280, 2), 
 ('Sunrise Memorial Hospital', 'Miami', 500, 2), 
-('Central Florida Medical Pavilion', 'Lakeland', 220, 3); 
+('Central Florida Medical', 'Lakeland', 220, 3); 
 
 
 INSERT INTO technicians (name, hospital_id) 
@@ -26,23 +26,23 @@ INSERT INTO equipments
 VALUES 
 ('EQ-BMC-0001', 'MedTech VitalScan X1', 'Available', 96, 1), 
 ('EQ-BMC-0002', 'MedTech VitalScan X1', 'In-Use', 74, 1), 
-('EQ-BMC-0003', 'MedTech PatientMonitor 500', 'Maintenance', 31, 1), 
+('EQ-BMC-0003', 'MedTech PTView 500', 'Maintenance', 31, 1), 
 ('EQ-BMC-0004', 'MedTech InfusionPro 200', 'Offline', 8, 1), 
 
 ('EQ-RGH-0001', 'MedTech VitalScan X2', 'Available', 88, 2), 
-('EQ-RGH-0002', 'MedTech PatientMonitor 500', 'In-Use', 67, 2), 
+('EQ-RGH-0002', 'MedTech PTView 500', 'In-Use', 67, 2), 
 ('EQ-RGH-0003', 'MedTech InfusionPro 200', 'Maintenance', 24, 2), 
 
 ('EQ-GCR-0001', 'MedTech VitalScan X1', 'Available', 93, 3), 
-('EQ-GCR-0002', 'MedTech PatientMonitor 500', 'In-Use', 58, 3), 
+('EQ-GCR-0002', 'MedTech PTView 500', 'In-Use', 58, 3), 
 ('EQ-GCR-0003', 'MedTech InfusionPro 300', 'Offline', 5, 3), 
 
 ('EQ-SMH-0001', 'MedTech VitalScan X2', 'In-Use', 81, 4), 
-('EQ-SMH-0002', 'MedTech PatientMonitor 500', 'Available', 97, 4), 
+('EQ-SMH-0002', 'MedTech PTView 500', 'Available', 97, 4), 
 ('EQ-SMH-0003', 'MedTech InfusionPro 300', 'Maintenance', 18, 4), 
 
 ('EQ-CFM-0001', 'MedTech VitalScan X1', 'Available', 91, 5), 
-('EQ-CFM-0002', 'MedTech PatientMonitor 500', 'In-Use', 63, 5), 
+('EQ-CFM-0002', 'MedTech PTView 500', 'In-Use', 63, 5), 
 ('EQ-CFM-0003', 'MedTech InfusionPro 200', 'Offline', 11, 5); 
 
 
@@ -70,36 +70,36 @@ INSERT INTO service_reports
 (work_order_id, file_url, notes, created_at) 
 VALUES 
 (3, 
- 's3://robopulse-service-reports/reports/3/calibration-report.txt', 
+ 's3://medflow-service-reports/reports/3/calibration-report.txt', 
  'Patient monitor calibration completed successfully. All sensors are within acceptable operating range.', 
  '2026-09-25 09:15:00'), 
 
 (5, 
- 's3://robopulse-service-reports/reports/5/inspection-report.txt', 
+ 's3://medflow-service-reports/reports/5/inspection-report.txt', 
  'Preventive maintenance completed. No hardware issues detected.', 
  '2026-09-26 11:30:00'), 
 
 (8, 
- 's3://robopulse-service-reports/reports/8/software-update.txt', 
+ 's3://medflow-service-reports/reports/8/software-update.txt', 
  'Software updated to the latest approved version. Device restarted successfully.', 
  '2026-09-27 14:20:00'), 
 
 (11, 
- 's3://robopulse-service-reports/reports/11/monitor-inspection.txt', 
+ 's3://medflow-service-reports/reports/11/monitor-inspection.txt', 
  'Routine inspection completed. Device passed all diagnostic checks.', 
  '2026-09-28 10:45:00'), 
 
 (2, 
- 's3://robopulse-service-reports/reports/2/battery-replacement.txt', 
+ 's3://medflow-service-reports/reports/2/battery-replacement.txt', 
  'Battery capacity significantly below recommended threshold. Replacement required.', 
  '2026-09-29 08:30:00'), 
 
 (10, 
- 's3://robopulse-service-reports/reports/10/emergency-recovery.txt', 
+ 's3://medflow-service-reports/reports/10/emergency-recovery.txt', 
  'Equipment recovered from offline state. Additional diagnostics recommended.', 
  '2026-09-29 16:10:00'), 
 
 (12, 
- 's3://robopulse-service-reports/reports/12/power-failure.txt', 
+ 's3://medflow-service-reports/reports/12/power-failure.txt', 
  'Unable to restore equipment after power-cycle procedure. Hardware inspection required.', 
  '2026-09-30 13:05:00');
