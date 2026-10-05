@@ -65,41 +65,40 @@ VALUES
 ('Patient monitor connectivity issue', 'Medium', 'In-Progress', 15, 10), 
 ('Offline equipment diagnostic', 'Critical', 'Pending', 16, 10); 
 
-
 INSERT INTO service_reports 
 (work_order_id, file_url, notes, created_at) 
 VALUES 
 (3, 
- 's3://medflow-service-reports/reports/3/calibration-report.txt', 
+ 'https://medflow-service-reports.s3/us-east-1.amazonaws/service_reports/3/calibration-report.txt', 
  'Patient monitor calibration completed successfully. All sensors are within acceptable operating range.', 
  '2026-09-25 09:15:00'), 
 
 (5, 
- 's3://medflow-service-reports/reports/5/inspection-report.txt', 
+ 'https://medflow-service-reports.s3/us-east-1.amazonaws/service_reports/5/inspection-report.txt', 
  'Preventive maintenance completed. No hardware issues detected.', 
  '2026-09-26 11:30:00'), 
 
 (8, 
- 's3://medflow-service-reports/reports/8/software-update.txt', 
+ 'https://medflow-service-reports.s3/us-east-1.amazonaws/service_reports/8/software-update.txt', 
  'Software updated to the latest approved version. Device restarted successfully.', 
  '2026-09-27 14:20:00'), 
 
 (11, 
- 's3://medflow-service-reports/reports/11/monitor-inspection.txt', 
+ 'https://medflow-service-reports.s3/us-east-1.amazonaws/service_reports/11/monitor-inspection.txt', 
  'Routine inspection completed. Device passed all diagnostic checks.', 
  '2026-09-28 10:45:00'), 
 
 (2, 
- 's3://medflow-service-reports/reports/2/battery-replacement.txt', 
+ 'https://medflow-service-reports.s3/us-east-1.amazonaws/service_reports/2/battery-replacement.txt', 
  'Battery capacity significantly below recommended threshold. Replacement required.', 
  '2026-09-29 08:30:00'), 
 
 (10, 
- 's3://medflow-service-reports/reports/10/emergency-recovery.txt', 
+ 'https://medflow-service-reports.s3/us-east-1.amazonaws/service_reports/10/emergency-recovery.txt', 
  'Equipment recovered from offline state. Additional diagnostics recommended.', 
  '2026-09-29 16:10:00'), 
 
 (12, 
- 's3://medflow-service-reports/reports/12/power-failure.txt', 
+ 'https://medflow-service-reports.s3/us-east-1.amazonaws/service_reports/12/power-failure.txt', 
  'Unable to restore equipment after power-cycle procedure. Hardware inspection required.', 
  '2026-09-30 13:05:00');
