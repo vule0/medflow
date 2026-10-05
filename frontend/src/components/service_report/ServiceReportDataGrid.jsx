@@ -92,7 +92,9 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
             const formData = new FormData();
 
             formData.append("work_order_id", formValues.work_order_id)
-            formData.append("file", selectedFile)
+            if (selectedFile){
+                formData.append("file", selectedFile)
+            }
             formData.append("notes", formValues.notes)
             await apiClient.post("/service_reports", formData);
 
@@ -135,7 +137,10 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
         try {
             const formData = new FormData()
             formData.append("work_order_id", editFormValues.work_order_id)
-            formData.append("file", selectedFile)
+            if (selectedFile){
+                formData.append("file", selectedFile)
+            }
+            
             formData.append("notes", editFormValues.notes)
             await apiClient.patch(`/service_reports/${serviceReport.id}`, formData);
 
@@ -144,7 +149,7 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
             onSuccess(
                 `Service report ${serviceReport.id} updated successfully`
             );
-
+            setSelectedFile(null)
             await fetchServiceReports();
         } catch (err) {
             console.error(err);
@@ -251,7 +256,7 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
 
             <Dialog
                 open={dialogOpen}
-                onClose={() => setDialogOpen(false)}
+                onClose={() => {setDialogOpen(false); setSelectedFile(null)}}
                 fullWidth
                 maxWidth="sm"
             >
@@ -329,7 +334,7 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
 
             <Dialog
                 open={editDialogOpen}
-                onClose={() => setEditDialogOpen(false)}
+                onClose={() => {setEditDialogOpen(false); setSelectedFile(null)}}
                 fullWidth
                 maxWidth="sm"
             >

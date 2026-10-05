@@ -12,7 +12,7 @@ FRONTEND_ORIGIN = settings.FRONTEND_ORIGIN
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_ORIGIN],
+    allow_origins=["http://localhost:5173",FRONTEND_ORIGIN],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
