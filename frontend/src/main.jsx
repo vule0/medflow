@@ -4,14 +4,16 @@ import './index.css'
 import App from './App.jsx'
 import { ThemeProvider, CssBaseline } from '@mui/material'
 import theme from './theme.js'
+import { ThemeModeProvider } from './context/ThemeModeContext.jsx'
 
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ThemeProvider theme={theme}>
-      <CssBaseline/>
+    <ThemeModeProvider>
+    {/* <ThemeProvider theme={theme}> */}
+      {/* <CssBaseline/> */}
           <App />
-    </ThemeProvider>
-
+    {/* </ThemeProvider> */}
+  </ThemeModeProvider>
   </StrictMode>,
 )

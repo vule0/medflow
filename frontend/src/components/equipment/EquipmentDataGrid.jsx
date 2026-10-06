@@ -331,7 +331,7 @@ function EquipmentDataGrid({ onSuccess }) {
             >
                 <DialogTitle
                     sx={{
-                        color: "black",
+                        color: "text.primary",
                         textAlign: "center"
                     }}
                 >
@@ -414,7 +414,7 @@ function EquipmentDataGrid({ onSuccess }) {
             >
                 <DialogTitle
                     sx={{
-                        color: "black",
+                        color: "text.primary",
                         textAlign: "center"
                     }}
                 >

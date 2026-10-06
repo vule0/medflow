@@ -316,7 +316,7 @@ function WorkOrderDataGrid({ onSuccess = () => { } }) {
             >
                 <DialogTitle
                     sx={{
-                        color: "black",
+                        color: "text.primary",
                         textAlign: "center"
                     }}
                 >
@@ -402,7 +402,7 @@ function WorkOrderDataGrid({ onSuccess = () => { } }) {
             >
                 <DialogTitle
                     sx={{
-                        color: "black",
+                        color: "text.primary",
                         textAlign: "center"
                     }}
                 >

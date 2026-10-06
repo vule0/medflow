@@ -104,7 +104,7 @@ async def update_work_order(work_order_id: int,
 async def get_work_order_by_hospital(hospital_id: int,
                                      db: AsyncSession = Depends(get_db),
                                      _: User = Depends(require_role(UserRole.CLINICAL_ADMIN, UserRole.FIELD_TECHNICIAN))):
-    statement = select(WorkOrder).where(WorkOrder.technician == hospital_id)
+    statement = select(WorkOrder).where(WorkOrder.technician_id == hospital_id).order_by(WorkOrder.id)
     work_orders = await db.execute(statement)
         
     return work_orders.scalars().all()

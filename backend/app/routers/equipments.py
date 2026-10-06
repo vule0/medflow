@@ -79,7 +79,7 @@ async def update_equipment(equipment_id: int,
 async def get_equipment_by_hospital(hospital_id: int,
                                     db:AsyncSession = Depends(get_db),
                                     _: User = Depends(require_role(UserRole.CLINICAL_ADMIN, UserRole.FIELD_TECHNICIAN))) -> list[Equipment]:
-    statement = select(Equipment).where(Equipment.hospital_id == hospital_id)
+    statement = select(Equipment).where(Equipment.hospital_id == hospital_id).order_by(Equipment.id)
     equipment = await db.execute(statement)
     
     return equipment.scalars().all()

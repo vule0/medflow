@@ -240,7 +240,7 @@ const ROLE_OPTIONS = [
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle sx={{color: "black", textAlign: "center"}}>
+        <DialogTitle sx={{color: "text.primary", textAlign: "center"}}>
           Create User
         </DialogTitle>
 
@@ -309,7 +309,7 @@ const ROLE_OPTIONS = [
         maxWidth="sm"
       >
         <DialogTitle
-            sx={{color: "black", textAlign: "center"}}>
+            sx={{color: "text.primary", textAlign: "center"}}>
           Edit User
         </DialogTitle>
 

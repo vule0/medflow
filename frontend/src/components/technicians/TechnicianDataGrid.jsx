@@ -167,7 +167,7 @@ function TechnicianDataGrid({ onSuccess }) {
             </Box>
 
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
-                <DialogTitle sx={{color: "black", textAlign: "center" }}>Add New Technician</DialogTitle>
+                <DialogTitle sx={{color: "text.primary", textAlign: "center" }}>Add New Technician</DialogTitle>
                 <DialogContent>
                     <Stack spacing={2} sx={{ mt: 1, minWidth: 300 }}>
                         <TextField label="Name" value={formValues.name} onChange={handleFieldChange("name")}/>
@@ -181,7 +181,7 @@ function TechnicianDataGrid({ onSuccess }) {
             </Dialog>
 
             <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
-                <DialogTitle sx={{ color: "black", textAlign: "center" }}>Edit hospital</DialogTitle>
+                <DialogTitle sx={{ color: "text.primary", textAlign: "center" }}>Edit hospital</DialogTitle>
                 <DialogContent>
                     <Stack spacing={2} sx={{ mt: 1, minWidth: 300 }}>
                         <TextField label="Name" value={editFormValues.name} onChange={ handleEditFieldChange("name")}/>

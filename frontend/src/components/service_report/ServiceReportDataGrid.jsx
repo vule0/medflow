@@ -261,7 +261,7 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
                 maxWidth="sm"
             >
                 <DialogTitle sx={{
-                    color: "black",
+                    color: "text.primary",
                     textAlign: "center"
                 }}>Add Service Report</DialogTitle>
 
@@ -339,7 +339,7 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
                 maxWidth="sm"
             >
                 <DialogTitle sx={{
-                    color: "black",
+                    color: "text.primary",
                     textAlign: "center"
                 }}>Edit Service Report</DialogTitle>
 

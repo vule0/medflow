@@ -234,7 +234,7 @@ function HospitalDataGrid({ onSuccess }) {
             >
                 <DialogTitle
                     sx={{
-                        color: "black",
+                        color: "text.primary",
                         textAlign: "center"
                     }}
                 >
@@ -301,7 +301,7 @@ function HospitalDataGrid({ onSuccess }) {
             >
                 <DialogTitle
                     sx={{
-                        color: "black",
+                        color: "text.primary",
                         textAlign: "center"
                     }}
                 >
