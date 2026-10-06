@@ -218,3 +218,4 @@ __marimo__/
 .streamlit/secrets.toml
 
 backend/package
+backend/lambda_deployment.zip

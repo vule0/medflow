@@ -76,7 +76,8 @@ function WorkOrderDataGrid({ onSuccess = () => { } }) {
     async function fetchWorkOrders() {
         setLoading(true);
         try {
-            const response = await apiClient.get("/work_orders");
+            const endpoint = role == "Field Technician" ? `/work_orders/hospital/${user.id}` : "/work_orders"
+            const response = await apiClient.get(endpoint);
             setWorkOrders(response.data);
             setError(null);
         } catch {

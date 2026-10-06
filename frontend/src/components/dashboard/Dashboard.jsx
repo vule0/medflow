@@ -37,58 +37,58 @@ const headerHeight = 64;
 function Dashboard() {
     const [selectedPage, setSelectedPage] = useState("reports");
     const [notification, setNotification] = useState(null);
-    const {role} = useAuth()
+    const { role } = useAuth()
     const menuItems = [
-    {
-        label: "Reports",
-        value: "reports",
-        icon: <AssessmentIcon/>
-    },
-    {
-        label: "Equipment",
-        value: "equipment",
-        icon: <BuildIcon />,
-    },
-    ...(role !== "Field Technician" ? [{
-        label: "Hospitals",
-        value: "hospitals",
-        icon: <LocalHospitalIcon />,
-    }
-    ] : []),
-    {
-        label: "Work Orders",
-        value: "workOrders",
-        icon: <AssignmentIcon />,
-    },
-    {
-        label: "Service Reports",
-        value: "serviceReports",
-        icon: <BuildCircleIcon />,
-    },
-    ...(role !== "Field Technician" ? [
         {
-            label: "Technicians",
-            value: "technicians",
-            icon: <BadgeIcon/>
-        }
-
-    ] : []),
-    ...(role === "Clinical Admin" ? [
+            label: "Reports",
+            value: "reports",
+            icon: <AssessmentIcon />
+        },
         {
-            label: "Users",
-            value: "users",
-            icon: <GroupIcon/>
-
+            label: "Equipment",
+            value: "equipment",
+            icon: <BuildIcon />,
+        },
+        ...(role !== "Field Technician" ? [{
+            label: "Hospitals",
+            value: "hospitals",
+            icon: <LocalHospitalIcon />,
         }
-    ]: []),
+        ] : []),
+        {
+            label: "Work Orders",
+            value: "workOrders",
+            icon: <AssignmentIcon />,
+        },
+        {
+            label: "Service Reports",
+            value: "serviceReports",
+            icon: <BuildCircleIcon />,
+        },
+        ...(role !== "Field Technician" ? [
+            {
+                label: "Technicians",
+                value: "technicians",
+                icon: <BadgeIcon />
+            }
 
-];
+        ] : []),
+        ...(role === "Clinical Admin" ? [
+            {
+                label: "Users",
+                value: "users",
+                icon: <GroupIcon />
+
+            }
+        ] : []),
+
+    ];
     const renderContent = () => {
         switch (selectedPage) {
             case "reports":
                 return <Reports />
             case "equipment":
-                return <EquipmentDataGrid onSuccess={setNotification}/>;
+                return <EquipmentDataGrid onSuccess={setNotification} />;
 
             case "hospitals":
                 return <HospitalDataGrid onSuccess={setNotification} />;
@@ -97,13 +97,13 @@ function Dashboard() {
                 return <WorkOrderDataGrid onSuccess={setNotification} />;
 
             case "serviceReports":
-                return <ServiceReportDataGrid onSuccess={setNotification}/>;
+                return <ServiceReportDataGrid onSuccess={setNotification} />;
 
             case "technicians":
-                return <TechnicianDataGrid onSuccess={setNotification}/>
-            
+                return <TechnicianDataGrid onSuccess={setNotification} />
+
             case "users":
-                return <UserDataGrid onSuccess={setNotification}/>
+                return <UserDataGrid onSuccess={setNotification} />
             default:
                 return <EquipmentDataGrid />;
         }
@@ -118,7 +118,7 @@ function Dashboard() {
             }}
         >
             <Drawer
-            variant="permanent"
+                variant="permanent"
                 sx={{
                     width: drawerWidth,
                     flexShrink: 0,
@@ -132,19 +132,18 @@ function Dashboard() {
                     },
                 }}
             >
-                <List sx={{p:0}}>
+                <List sx={{ p: 0 }}>
                     {menuItems.map((item) => (
                         <ListItemButton
                             key={item.value}
                             selected={selectedPage === item.value}
                             onClick={() => setSelectedPage(item.value)}
                             sx={{
+                                "&.Mui-selected": {
+                                    backgroundColor: "rgba(20, 150, 127, 0.12)",
 
-    "&.Mui-selected": {
-      backgroundColor: "rgba(20, 150, 127, 0.12)",
-
-    },
-  }}
+                                },
+                            }}
                         >
                             <ListItemIcon>
                                 {item.icon}

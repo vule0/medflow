@@ -11,9 +11,9 @@ function HospitalMaintenanceCard({ hospital }) {
         </Typography>
         <Typography color="text.secondary" gutterBottom>Hospital ID: {hospital.hospital_id}
         </Typography>
-        <Stack  spacing={1} sx={{alignItems:"center", justifyContent: "center"}} >
+        <Stack spacing={1} sx={{ alignItems: "center", justifyContent: "center" }} >
           <Chip label={`Total Equipment: ${hospital.total_equipment}`} color="" />
-          <Chip label={`${hospital.maintenance_percentage}% under maintenance`} color="warning"/>
+          <Chip label={`${hospital.maintenance_percentage}% under maintenance`} color="warning" />
         </Stack>
       </CardContent>
     </Card>

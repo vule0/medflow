@@ -16,7 +16,7 @@ import {
     MenuItem,
     Stack,
     TextField,
-    Typography, 
+    Typography,
     LinearProgress
 } from "@mui/material";
 
@@ -212,45 +212,46 @@ function EquipmentDataGrid({ onSuccess }) {
         //     type: "number"
         // },
         {
-    field: "charge_level",
-    headerName: "Battery",
-    flex: .7,
-    renderCell: (params) => {
-        const value = Math.round(params.value)
-        const color = value <= 20 ? "error" : value < 50 ? "warning" : "success"
+            field: "charge_level",
+            headerName: "Battery",
+            flex: .7,
+            renderCell: (params) => {
+                const value = Math.round(params.value)
+                const color = value <= 20 ? "error" : value < 50 ? "warning" : "success"
 
-        return (
-            <Box
-                sx={{
-                    width: "100%",
-                    height: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                }}
-            >
-                <LinearProgress
-                    variant="determinate"
-                    value={value}
-                    color={color}
-                    sx={{
-                        flexGrow: 1,
-                        height: 10,
-                        borderRadius: 5,
-                        backgroundColor: "grey.200",
-                        "& .MuiLinearProgress-bar": {
-                            borderRadius: 5,
-                        },
-                    }}
-                />
+                return (
+                    <Box
+                        sx={{
+                            width: "100%",
+                            height: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                        }}
+                    >
+                        <LinearProgress
+                            variant="determinate"
+                            value={value}
+                            color={color}
+                            sx={{
+                                flexGrow: 1,
+                                height: 10,
+                                borderRadius: 5,
+                                backgroundColor: "grey.200",
+                                "& .MuiLinearProgress-bar": {
+                                    borderRadius: 5,
+                                },
+                            }}
+                        />
 
-                <Typography variant="body2" sx={{
-                        minWidth: 38,
-                        textAlign: "right",}}>{value}%</Typography>
-            </Box>
-        );
-    },
-},
+                        <Typography variant="body2" sx={{
+                            minWidth: 38,
+                            textAlign: "right",
+                        }}>{value}%</Typography>
+                    </Box>
+                );
+            },
+        },
         {
             field: "hospital_id",
             headerName: "Hospital ID",
@@ -299,11 +300,11 @@ function EquipmentDataGrid({ onSuccess }) {
     return (
         <Box sx={{ width: "100%" }}>
             {error && (
-            <Alert severity="error">
-                {error}
-            </Alert>
-            
-        )}
+                <Alert severity="error">
+                    {error}
+                </Alert>
+
+            )}
             {role === "Clinical Admin" && (
                 <Button
                     variant="outlined"

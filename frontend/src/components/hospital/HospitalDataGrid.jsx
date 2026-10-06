@@ -26,7 +26,7 @@ import { useAuth } from "../../context/AuthContext";
 
 
 function HospitalDataGrid({ onSuccess }) {
-    const {user, role} = useAuth();
+    const { user, role } = useAuth();
     const [hospitals, setHospitals] = useState([])
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null)
@@ -57,7 +57,7 @@ function HospitalDataGrid({ onSuccess }) {
             setError(null)
         } catch {
             setError("Could not load hospital data");
-        } finally{
+        } finally {
             setLoading(false);
         }
     }
@@ -101,7 +101,7 @@ function HospitalDataGrid({ onSuccess }) {
             await fetchHospitals()
         } catch (error) {
             setError(
-                 error.response?.data?.detail ||
+                error.response?.data?.detail ||
                 "Could not create hospital"
             )
         }
@@ -169,26 +169,26 @@ function HospitalDataGrid({ onSuccess }) {
 
 
     const columns = [
-        {field: "id", headerName:"ID", flex: 0.5},
-        {field:"name", headerName:"Name", flex: 1},
-        {field:"location_region", headerName:"Location Region", flex: .7},
-        {field:"capacity", headerName:"Capacity", flex:.6},
-        {field:"supervisor_id", headerName:"Supervisor ID", flex: .5},
+        { field: "id", headerName: "ID", flex: 0.5 },
+        { field: "name", headerName: "Name", flex: 1 },
+        { field: "location_region", headerName: "Location Region", flex: .7 },
+        { field: "capacity", headerName: "Capacity", flex: .6 },
+        { field: "supervisor_id", headerName: "Supervisor ID", flex: .5 },
         ...(role === "Clinical Admin" ?
             [{
-                field:"actions", type:"actions", headerName:"Actions", flex: 0.6,
+                field: "actions", type: "actions", headerName: "Actions", flex: 0.6,
                 getActions: (params) => [
                     <GridActionsCellItem
-                    key="edit"
-                    label="Edit"
-                    icon={<EditIcon/>}
-                    onClick={() => handleEdit(params.row)}
+                        key="edit"
+                        label="Edit"
+                        icon={<EditIcon />}
+                        onClick={() => handleEdit(params.row)}
                     />,
                     <GridActionsCellItem
-                    key="delete"
-                    label="Delete"
-                    icon={<DeleteIcon/>}
-                    onClick={() => handleDelete(params.row)}
+                        key="delete"
+                        label="Delete"
+                        icon={<DeleteIcon />}
+                        onClick={() => handleDelete(params.row)}
                     />
                 ]
             }]
