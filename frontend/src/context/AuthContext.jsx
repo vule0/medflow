@@ -10,6 +10,7 @@ function decodeToken(token){
 
 export function AuthProvider({children}){
     const [token, setToken] = useState(() => localStorage.getItem('medflowToken'))
+    const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('medflowRefreshToken'))
 
     const user = useMemo(() => token ? decodeToken(token) : null, [token])
 
@@ -23,12 +24,21 @@ export function AuthProvider({children}){
         });
 
         localStorage.setItem('medflowToken', response.data.access_token)
+        localStorage.setItem('medflowRefreshToken', response.data.refresh_token)
         setToken(response.data.access_token)
+        setRefreshToken(response.data.refresh_token)
     }
 
-    const logout = () => {
+    const logout = async () => {
+        if (refreshToken) {
+            await apiClient.post("/auth/logout", {
+                refresh_token: refreshToken,
+            });
+}
         localStorage.removeItem('medflowToken');
+        localStorage.removeItem('medflowRefreshToken');
         setToken(null)
+        setRefreshToken(null)
     }
 
     const value = {token, user, isAuthenticated: Boolean(token), login, logout, role: user?.role}

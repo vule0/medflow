@@ -1,13 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from datetime import datetime, timezone
 
-from sqlalchemy import select, func
+from uuid import uuid4
+
+from sqlalchemy import select, func, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies import get_db, require_role
-from app.models import User, UserRole
-from app.schemas.user import Token, UserCreate, UserRead
-from app.security import create_access_token, hash_password, verify_password
+from app.models import User, UserRole, RefreshToken
+from app.schemas.user import Token, UserCreate, UserRead, RefreshRequest, LogoutRequest
+from app.security import create_access_token, hash_password, verify_password, create_refresh_token, hash_refresh_token, refresh_token_expiry
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -25,7 +28,20 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(),
         )
         
     access_token = create_access_token(data={"sub": user.username, "role": user.role.value, "id": user.id})
-    return Token(access_token=access_token, token_type="bearer")
+    refresh_token = create_refresh_token()
+    
+    refresh_token_row = RefreshToken(
+        user_id=user.id,
+        token_hash = hash_refresh_token(refresh_token),
+        expiry = refresh_token_expiry(),
+        revoked_flag = False,
+        chain_id = uuid4()
+    )
+    
+    db.add(refresh_token_row)
+    await db.commit()
+    
+    return Token(access_token=access_token, token_type="bearer", refresh_token=refresh_token)
 
 
 @router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
@@ -49,3 +65,92 @@ async def register_user(payload: UserCreate,
     await db.commit()
     await db.refresh(user)
     return user
+
+@router.post("/refresh", response_model=Token)
+async def refresh_access_token(payload: RefreshRequest,
+                               db: AsyncSession = Depends(get_db)) -> Token:
+    token_hash = hash_refresh_token(payload.refresh_token)
+    
+    result = await db.execute(select(RefreshToken).where(RefreshToken.token_hash == token_hash))
+    
+    stored_token = result.scalar_one_or_none()
+    
+    if stored_token is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token.",
+        )
+    
+    # re-used token
+    if stored_token.revoked_flag: 
+        statement = update(RefreshToken).where(RefreshToken.chain_id == stored_token.chain_id).values(revoked_flag = True)
+        
+        await db.execute(statement)
+        await db.commit()
+        
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token reuse detected. Revoking flags."
+        )
+        
+    # expired token
+    if stored_token.expiry <= datetime.now(timezone.utc):
+        stored_token.revoked_flag = True
+        await db.commit()
+        
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token expired."
+        )
+    
+    # if refresh token valid, get user
+    result = await db.execute(
+        select(User).where(User.id == stored_token.user_id)
+    )
+
+    user = result.scalar_one_or_none()
+
+    if user is None:
+        stored_token.revoked_flag = True
+        await db.commit()
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found.",
+        )
+    
+    
+    stored_token.revoked_flag = True
+    
+    new_refresh_token = create_refresh_token()
+    
+    new_refresh_token_row = RefreshToken(
+        user_id = user.id,
+        token_hash = hash_refresh_token(new_refresh_token),
+        expiry=stored_token.expiry,
+        chain_id=stored_token.chain_id,
+        revoked_flag=False
+    )
+    
+    db.add(new_refresh_token_row)
+    
+    new_access_token = create_access_token(data={"sub": user.username, "role": user.role.value, "id": user.id})
+    
+    await db.commit()
+    
+    return Token(access_token=new_access_token, token_type="bearer", refresh_token=new_refresh_token)
+
+@router.post("/logout")
+async def logout(payload: LogoutRequest,
+                 db: AsyncSession = Depends(get_db)):
+    
+    token_hash = hash_refresh_token(payload.refresh_token)
+    
+    result = await db.execute(select(RefreshToken).where(RefreshToken.token_hash == token_hash))
+    
+    stored_token = result.scalar_one_or_none()
+    if stored_token is not None:
+        stored_token.revoked_flag = True
+        await db.commit()
+        
+    return {"message": "Logged Out"}
