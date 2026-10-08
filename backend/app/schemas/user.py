@@ -1,27 +1,22 @@
 from pydantic import BaseModel, ConfigDict, Field
-
-class RoleRead(BaseModel):
-    id: int
-    name: str
-    
-    model_config = ConfigDict(from_attributes=True)
-
+from app.schemas.role import RoleRead
 class UserBase(BaseModel):
     # id: int
     username: str = Field(min_length=3, max_length=50)
-    role: str
+    role_id: int
     
 class UserCreate(UserBase):
     password: str = Field(min_length=3)
     
 class UserRead(UserBase):
     id: int
+    role: str
     model_config = ConfigDict(from_attributes=True)
     
     
 class UserUpdate(UserBase):
     username : str | None = Field(default=None, min_length=3, max_length=50)    
-    role: RoleRead | None = None
+    role_id: int | None = None
 
 class Token(BaseModel):
     access_token: str

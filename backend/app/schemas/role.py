@@ -4,7 +4,8 @@ class RoleBase(BaseModel):
     name: str = Field(max_length=32)
     
 class RoleCreate(RoleBase):
-    pass
+    name: str
+    permissions: list[str]
 
 class RoleRead(RoleBase):
     id: int
@@ -12,4 +13,5 @@ class RoleRead(RoleBase):
     
     model_config = ConfigDict(from_attributes=True)
     
-    
+class RolePermissionsUpdate(BaseModel):
+    permissions: list[str]

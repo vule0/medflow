@@ -19,14 +19,13 @@ import apiClient from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
 
 function UserDataGrid({ onSuccess }) {
-  const { role, hasPermission } = useAuth();
-
-const ROLE_OPTIONS = [
-    "Clinical Admin",
-    "Field Technician",
-    "Auditor"
-  ];
-
+  const { hasPermission } = useAuth();
+// const ROLE_OPTIONS = [
+//     "Clinical Admin",
+//     "Field Technician",
+//     "Auditor"
+//   ];
+  const [ROLE_OPTIONS, setRoleOptions] = useState([])
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -39,14 +38,22 @@ const ROLE_OPTIONS = [
   const [formValues, setFormValues] = useState({
     username: "",
     password: "",
-    role: "",
+    role_id: "",
   });
 
   const [editFormValues, setEditFormValues] = useState({
     username: "",
-    role: "",
+    role_id: ""
   });
 
+  async function getRoles(){
+    try{
+      const response = await apiClient.get("/roles")
+      setRoleOptions(response.data)
+    } catch (error){
+      console.log(error)
+    }
+  }
   async function fetchUsers() {
     setLoading(true);
 
@@ -67,7 +74,9 @@ const ROLE_OPTIONS = [
 
   useEffect(() => {
     fetchUsers();
+    getRoles();
   }, []);
+
 
   const handleFieldChange = (field) => (event) => {
     setFormValues((prev) => ({
@@ -85,8 +94,9 @@ const ROLE_OPTIONS = [
 
   async function handleCreate() {
     try {
+      console.log(formValues)
       await apiClient.post("/auth/register", formValues);
-
+      console.log(formValues)
       setDialogOpen(false);
 
       onSuccess(
@@ -107,11 +117,12 @@ const ROLE_OPTIONS = [
   }
 
   function handleEdit(user) {
+    console.log("test", user)
     setSelectedUser(user);
 
     setEditFormValues({
       username: user.username,
-      role: user.role,
+      role: user.role_id,
     });
 
     setEditDialogOpen(true);
@@ -119,6 +130,7 @@ const ROLE_OPTIONS = [
 
   async function handleUpdate(user) {
     try {
+      console.log(editFormValues)
       await apiClient.patch(
         `/users/${user.id}`,
         editFormValues
@@ -268,15 +280,15 @@ const ROLE_OPTIONS = [
               label="Role"
               size="small"
               fullWidth
-              value={formValues.role}
-              onChange={handleFieldChange("role")}
+              value={formValues.role_id}
+              onChange={handleFieldChange("role_id")}
             >
               {ROLE_OPTIONS.map((option) => (
                 <MenuItem
-                  key={option}
-                  value={option}
+                  key={option.id}
+                  value={option.id}
                 >
-                  {option}
+                  {option.name}
                 </MenuItem>
               ))}
             </TextField>
@@ -328,15 +340,15 @@ const ROLE_OPTIONS = [
               label="Role"
               size="small"
               fullWidth
-              value={editFormValues.role}
-              onChange={handleEditFieldChange("role")}
+              value={editFormValues.role_id}
+              onChange={handleEditFieldChange("role_id")}
             >
               {ROLE_OPTIONS.map((option) => (
                 <MenuItem
-                  key={option}
-                  value={option}
+                  key={option.id}
+                  value={option.id}
                 >
-                  {option}
+                  {option.name}
                 </MenuItem>
               ))}
             </TextField>

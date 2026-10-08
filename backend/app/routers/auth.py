@@ -8,11 +8,11 @@ from sqlalchemy import select, func, update
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies import get_db, require_role, get_current_user
+from app.dependencies import get_db, require_role, get_current_user, require_permission
 from app.models import User, UserRole, RefreshToken
 from app.schemas.user import Token, UserCreate, UserRead, RefreshRequest, LogoutRequest
 from app.security import create_access_token, hash_password, verify_password, create_refresh_token, hash_refresh_token, refresh_token_expiry
-from app.models import Role, RolePermissions
+from app.models import Role, RolePermissions, Permissions
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -49,7 +49,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(),
 @router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def register_user(payload: UserCreate,
                         db: AsyncSession = Depends(get_db), 
-                        _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))) -> User:
+                        _: User = Depends(require_permission(Permissions.USER_WRITE))) -> User:
     existing = await db.execute(select(User).where(func.lower(User.username) == payload.username.lower()))
     if existing.scalar_one_or_none() is not None:
         raise HTTPException(
@@ -60,12 +60,15 @@ async def register_user(payload: UserCreate,
     user = User(
         username = payload.username,
         hashed_password = hash_password(payload.password), 
-        role = payload.role
+        role_id = payload.role_id
     )
     
     db.add(user)
     await db.commit()
-    await db.refresh(user)
+    result = await db.execute(select(User).options(selectinload(User.role)).where(User.id == user.id))
+
+    user = result.scalar_one()
+
     return user
 
 @router.post("/refresh", response_model=Token)
@@ -165,3 +168,4 @@ async def get_role_permissions(current_user: User = Depends(get_current_user),
     # permissions = ROLE_PERMISSIONS.get(current_user.role, set())
     permissions = result.scalars().all()
     return {"permissions": permissions}
+

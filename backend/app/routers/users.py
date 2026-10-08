@@ -19,6 +19,7 @@ async def get_users(db: AsyncSession = Depends(get_db),
     users = list(results.scalars().all())
     return [UserRead(id=user.id,
                      username=user.username,
+                     role_id=user.role_id,
                      role=user.role.name) for user in users]
 
 
@@ -78,4 +79,7 @@ async def update_user(user_id: int,
     result = await db.execute(statement)
     res = result.scalar_one()
 
-    return res
+    return UserRead(id=res.id,
+                    username=res.username,
+                    role_id=res.role_id,
+                    role=res.role.name)

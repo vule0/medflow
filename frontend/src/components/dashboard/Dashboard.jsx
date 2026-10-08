@@ -39,7 +39,7 @@ const headerHeight = 64;
 function Dashboard() {
     const [selectedPage, setSelectedPage] = useState("reports");
     const [notification, setNotification] = useState(null);
-    const { role, hasPermission } = useAuth()
+    const { hasPermission } = useAuth()
     const menuItems = [
         ...(hasPermission("analytics:read") ? [{
             label: "Reports",
@@ -58,16 +58,19 @@ function Dashboard() {
             icon: <LocalHospitalIcon />,
         }
         ] : []),
-        {
+        ...(hasPermission("work_order:read") ? [{
             label: "Work Orders",
             value: "workOrders",
             icon: <AssignmentIcon />,
-        },
-        {
+        }
+        ] : []),
+         ...(hasPermission("report:read") ? [{
             label: "Service Reports",
             value: "serviceReports",
             icon: <BuildCircleIcon />,
-        },
+        }
+        ] : []),
+        
         ...(hasPermission("technician:read") ? [
             {
                 label: "Technicians",
@@ -116,7 +119,7 @@ function Dashboard() {
                 return <UserDataGrid onSuccess={setNotification} />
 
             case "roles":
-                return <RolesManager />
+                return <RolesManager onSuccess={setNotification}/>
             default:
                 return <EquipmentDataGrid />;
         }
