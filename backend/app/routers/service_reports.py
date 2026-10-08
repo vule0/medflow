@@ -3,9 +3,9 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies import get_db, require_role, get_current_user
+from app.dependencies import get_db, require_role, get_current_user, require_permission
 from app.schemas.service_report import ServiceReportCreate, ServiceReportRead, ServiceReportUpdate
-from app.models import ServiceReport, UserRole, User
+from app.models import ServiceReport, UserRole, User, Permissions
 
 from uuid import uuid4
 
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/service_reports", tags=["service_reports"])
 
 @router.get("", response_model=list[ServiceReportRead])
 async def get_service_reports(db: AsyncSession = Depends(get_db),
-                              _: User = Depends(get_current_user)) -> list[ServiceReport]:
+                              _: User = Depends(require_permission(Permissions.REPORT_READ))) -> list[ServiceReport]:
 
     statement = select(ServiceReport).order_by(ServiceReport.id)
     results = await db.execute(statement)
@@ -45,7 +45,7 @@ async def create_service_report(work_order_id: int = Form(...),
                                 file: UploadFile = File(...),
                                 # payload: ServiceReportCreate,
                                 db: AsyncSession = Depends(get_db),
-                                _: User = Depends(require_role(UserRole.CLINICAL_ADMIN, UserRole.FIELD_TECHNICIAN))) -> ServiceReport:
+                                _: User = Depends(require_permission(Permissions.REPORT_WRITE))) -> ServiceReport:
     
     file_key = f"service_reports/{uuid4()}-{file.filename}"
     file_url = await upload_report(file=file, file_key=file_key)
@@ -70,7 +70,7 @@ async def create_service_report(work_order_id: int = Form(...),
 @router.delete("/{service_report_id}")
 async def delete_service_report(service_report_id: int,
                                 db: AsyncSession = Depends(get_db),
-                                _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))):
+                                _: User = Depends(require_permission(Permissions.REPORT_DELETE))):
 
     service_report = await db.get(ServiceReport,service_report_id)
 
@@ -120,7 +120,7 @@ async def update_service_report(service_report_id: int,
                                 notes: str | None = Form(None),
                                 file: UploadFile | None = File(None),
                                 db: AsyncSession = Depends(get_db),
-                                _: User = Depends(require_role(UserRole.CLINICAL_ADMIN, UserRole.FIELD_TECHNICIAN,))) -> ServiceReport:
+                                _: User = Depends(require_permission(Permissions.REPORT_WRITE))) -> ServiceReport:
 
     service_report = await db.get(ServiceReport, service_report_id,)
 

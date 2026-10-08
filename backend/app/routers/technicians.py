@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies import get_db, require_role, get_current_user
-from app.models import Technician, User, UserRole
+from app.dependencies import get_db, require_role, get_current_user, require_permission
+from app.models import Technician, User, UserRole, Permissions
 from app.schemas.technician import TechnicianRead, TechnicianUpdate, TechnicianCreate
 
 
@@ -12,7 +12,7 @@ router = APIRouter(prefix="/technicians", tags=["technicians"])
 
 @router.get("", response_model=list[TechnicianRead])
 async def get_technicians(db: AsyncSession = Depends(get_db),
-                          _: User = Depends(get_current_user)) -> list[Technician]:
+                          _: User = Depends(require_permission(Permissions.TECHNICIAN_READ))) -> list[Technician]:
     statement = select(Technician).order_by(Technician.id)
         
     response = await db.execute(statement)
@@ -36,7 +36,7 @@ async def find_technician(technician_id: int,
 @router.post("", response_model=TechnicianRead)
 async def create_technician(payload: TechnicianCreate,
                             db: AsyncSession = Depends(get_db),
-                            _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))) -> Technician:
+                            _: User = Depends(require_permission(Permissions.TECHNICIAN_WRITE))) -> Technician:
     technician = Technician(**payload.model_dump())
     db.add(technician)
     await db.commit()
@@ -47,7 +47,7 @@ async def create_technician(payload: TechnicianCreate,
 async def update_technician(technician_id: int,
                             payload: TechnicianUpdate,
                             db: AsyncSession = Depends(get_db),
-                            _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))) -> Technician:
+                            _: User = Depends(require_permission(Permissions.TECHNICIAN_WRITE))) -> Technician:
     res = await db.get(Technician, technician_id)
             
     if res is None:
@@ -69,7 +69,7 @@ async def update_technician(technician_id: int,
 @router.delete("/{technician_id}")
 async def delete_technician(technician_id:int,
                             db: AsyncSession = Depends(get_db),
-                            _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))):
+                            _: User = Depends(require_permission(Permissions.TECHNICIAN_WRITE))):
     res = await db.get(Technician, technician_id)
         
     if res is None:

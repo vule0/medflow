@@ -27,7 +27,7 @@ import apiClient from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
 
 function EquipmentDataGrid({ onSuccess }) {
-    const { user, role } = useAuth();
+    const { user, role, hasPermission } = useAuth();
     const STATUS_OPTIONS = [
         "Available",
         "In-Use",
@@ -258,7 +258,7 @@ function EquipmentDataGrid({ onSuccess }) {
             flex: 0.5,
             type: "number"
         },
-        ...(role === "Clinical Admin"
+        ...(hasPermission("equipment:write")
             ? [
                 {
                     field: "actions",
@@ -305,7 +305,7 @@ function EquipmentDataGrid({ onSuccess }) {
                 </Alert>
 
             )}
-            {role === "Clinical Admin" && (
+            {hasPermission("equipment:write") && (
                 <Button
                     variant="outlined"
                     color="primary"

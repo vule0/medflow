@@ -2,20 +2,25 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
-from app.dependencies import get_db, get_current_user, require_role
+from app.dependencies import get_db, get_current_user, require_role, require_permission
 from app.schemas.user import UserCreate, UserRead, UserUpdate
-from app.models import UserRole, User
+from app.models import UserRole, User, Permissions
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("", response_model=list[UserRead])
 async def get_users(db: AsyncSession = Depends(get_db),
-                    _: User = Depends(get_current_user)) -> list[User]:
-    statement = select(User).order_by(User.id)
+                    _: User = Depends(require_permission(Permissions.USER_READ))) -> list[User]:
+    statement = select(User).options(selectinload(User.role)).order_by(User.id)
     results = await db.execute(statement)
-    return list(results.scalars().all())
+    users = list(results.scalars().all())
+    return [UserRead(id=user.id,
+                     username=user.username,
+                     role=user.role.name) for user in users]
+
 
 # @router.post("", response_model=UserRead)
 # async def create_user(payload: UserCreate,
@@ -32,7 +37,7 @@ async def get_users(db: AsyncSession = Depends(get_db),
 @router.delete("/{user_id}")
 async def delete_user(user_id: int,
                       db:  AsyncSession = Depends(get_db),
-                      _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))):
+                      _: User = Depends(require_permission(Permissions.USER_WRITE))):
     res = await db.get(User, user_id)
             
     if res is None:
@@ -49,7 +54,7 @@ async def delete_user(user_id: int,
 async def update_user(user_id: int,
                             payload: UserUpdate,
                             db: AsyncSession = Depends(get_db),
-                            _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))) -> User:
+                            _: User = Depends(require_permission(Permissions.USER_WRITE))) -> User:
     res = await db.get(User, user_id)
             
     if res is None:
@@ -64,5 +69,13 @@ async def update_user(user_id: int,
         setattr(res, field, value)
     
     await db.commit()
-    await db.refresh(res)
+    statement = (
+        select(User)
+        .options(selectinload(User.role))
+        .where(User.id == user_id)
+    )
+
+    result = await db.execute(statement)
+    res = result.scalar_one()
+
     return res

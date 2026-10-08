@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import hospitals, equipments, work_orders, service_reports, auth, reports, technicians, users, health
+from app.routers import hospitals, equipments, work_orders, service_reports, auth, reports, technicians, users, health, roles
 from app.config import settings
 
 app = FastAPI(
@@ -28,3 +28,4 @@ app.include_router(reports.router)
 app.include_router(technicians.router)
 app.include_router(users.router)
 app.include_router(health.router)
+app.include_router(roles.router)

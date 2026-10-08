@@ -3,15 +3,15 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies import get_db, get_current_user, require_role
-from app.models import Hospital, User, UserRole
+from app.dependencies import get_db, get_current_user, require_role, require_permission
+from app.models import Hospital, User, UserRole, Permissions
 from app.schemas.hospital import HospitalCreate, HospitalRead, HospitalUpdate
 
 router = APIRouter(prefix="/hospitals", tags=["hospitals"])
 
 @router.get("", response_model=list[HospitalRead])
 async def get_hospitals(db: AsyncSession = Depends(get_db),
-                        _: User = Depends(get_current_user)) -> list[Hospital]:
+                        _: User = Depends(require_permission(Permissions.HOSPITAL_READ))) -> list[Hospital]:
     statement = select(Hospital).order_by(Hospital.id)
     result = await db.execute(statement)
     
@@ -34,7 +34,7 @@ async def find_hospital(hospital_id: int,
 @router.post("", response_model=HospitalRead)
 async def create_hospital(payload: HospitalCreate, 
                           db: AsyncSession = Depends(get_db),
-                          _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))) -> Hospital:
+                          _: User = Depends(require_permission(Permissions.HOSPITAL_WRITE))) -> Hospital:
     
     hospital = Hospital(**payload.model_dump())
     
@@ -46,7 +46,7 @@ async def create_hospital(payload: HospitalCreate,
 @router.delete("/{hospital_id}")
 async def delete_hospital(hospital_id: int,
                           db: AsyncSession = Depends(get_db),
-                          _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))):
+                          _: User = Depends(require_permission(Permissions.HOSPITAL_WRITE))):
     hospital = await db.get(Hospital, hospital_id)
     
     if hospital is None:
@@ -63,7 +63,7 @@ async def delete_hospital(hospital_id: int,
 async def update_hospital(hospital_id: int,
                           payload: HospitalUpdate,
                           db: AsyncSession = Depends(get_db),
-                          _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))) -> Hospital:
+                          _: User = Depends(require_permission(Permissions.HOSPITAL_WRITE))) -> Hospital:
     
     hospital = await db.get(Hospital, hospital_id)
         

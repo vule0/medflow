@@ -20,6 +20,7 @@ import BuildCircleIcon from "@mui/icons-material/BuildCircle";
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import BadgeIcon from '@mui/icons-material/Badge';
 import GroupIcon from '@mui/icons-material/Group';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 
 import EquipmentDataGrid from "../equipment/EquipmentDataGrid";
 import HospitalDataGrid from "../hospital/HospitalDataGrid";
@@ -28,6 +29,7 @@ import ServiceReportDataGrid from "../service_report/ServiceReportDataGrid";
 import Reports from "../reports/Reports";
 import TechnicianDataGrid from "../technicians/TechnicianDataGrid";
 import UserDataGrid from "../users/UserDataGrid";
+import RolesManager from "../roles/RolesManager";
 import { useAuth } from "../../context/AuthContext";
 
 const drawerWidth = 240;
@@ -37,19 +39,20 @@ const headerHeight = 64;
 function Dashboard() {
     const [selectedPage, setSelectedPage] = useState("reports");
     const [notification, setNotification] = useState(null);
-    const { role } = useAuth()
+    const { role, hasPermission } = useAuth()
     const menuItems = [
-        {
+        ...(hasPermission("analytics:read") ? [{
             label: "Reports",
             value: "reports",
             icon: <AssessmentIcon />
-        },
+        }
+        ] : []),
         {
             label: "Equipment",
             value: "equipment",
             icon: <BuildIcon />,
         },
-        ...(role !== "Field Technician" ? [{
+        ...(hasPermission("hospital:read") ? [{
             label: "Hospitals",
             value: "hospitals",
             icon: <LocalHospitalIcon />,
@@ -65,7 +68,7 @@ function Dashboard() {
             value: "serviceReports",
             icon: <BuildCircleIcon />,
         },
-        ...(role !== "Field Technician" ? [
+        ...(hasPermission("technician:read") ? [
             {
                 label: "Technicians",
                 value: "technicians",
@@ -73,7 +76,7 @@ function Dashboard() {
             }
 
         ] : []),
-        ...(role === "Clinical Admin" ? [
+        ...(hasPermission("user:read") ? [
             {
                 label: "Users",
                 value: "users",
@@ -81,6 +84,13 @@ function Dashboard() {
 
             }
         ] : []),
+        ...(hasPermission("role:manage") ? [
+            {
+                label: "Roles",
+                value: "roles",
+                icon:  <ManageAccountsIcon />
+            }
+        ] : [])
 
     ];
     const renderContent = () => {
@@ -104,6 +114,9 @@ function Dashboard() {
 
             case "users":
                 return <UserDataGrid onSuccess={setNotification} />
+
+            case "roles":
+                return <RolesManager />
             default:
                 return <EquipmentDataGrid />;
         }

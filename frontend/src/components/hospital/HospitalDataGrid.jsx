@@ -26,7 +26,7 @@ import { useAuth } from "../../context/AuthContext";
 
 
 function HospitalDataGrid({ onSuccess }) {
-    const { user, role } = useAuth();
+    const { hasPermission } = useAuth();
     const [hospitals, setHospitals] = useState([])
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null)
@@ -174,7 +174,7 @@ function HospitalDataGrid({ onSuccess }) {
         { field: "location_region", headerName: "Location Region", flex: .7 },
         { field: "capacity", headerName: "Capacity", flex: .6 },
         { field: "supervisor_id", headerName: "Supervisor ID", flex: .5 },
-        ...(role === "Clinical Admin" ?
+        ...(hasPermission("hospital:write") ?
             [{
                 field: "actions", type: "actions", headerName: "Actions", flex: 0.6,
                 getActions: (params) => [
@@ -209,7 +209,7 @@ function HospitalDataGrid({ onSuccess }) {
     return (
         <Box sx={{ width: "100%" }}>
 
-            {role === "Clinical Admin" && (
+            {hasPermission("hospital:write") && (
                 <Button
                     variant="outlined"
                     sx={{ mb: 2 }}

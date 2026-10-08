@@ -7,9 +7,11 @@ from .service_report import ServiceReport
 from .technician import Technician
 from .user import User
 from .token import RefreshToken
+from .role import Role, RolePermissions
 __all__ = [
     "Base",
-    "EquipmentStatus", "WorkOrderPriority", "WorkOrderStatus", "UserRole",
+    "EquipmentStatus", "WorkOrderPriority", "WorkOrderStatus", "UserRole", "Permissions",
     "Hospital", "Equipment", "WorkOrder", "ServiceReport", "Technician", "User",
-    "RefreshToken"
+    "RefreshToken",
+    "Role", "RolePermissions"
 ]

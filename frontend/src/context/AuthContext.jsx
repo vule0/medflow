@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState, useEffect} from "react";
 import apiClient from "../api/client";
 
 const AuthContext = createContext(null)
@@ -11,6 +11,7 @@ function decodeToken(token){
 export function AuthProvider({children}){
     const [token, setToken] = useState(() => localStorage.getItem('medflowToken'))
     const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('medflowRefreshToken'))
+    const [permissions, setPermissions] = useState([])
 
     const user = useMemo(() => token ? decodeToken(token) : null, [token])
 
@@ -27,6 +28,30 @@ export function AuthProvider({children}){
         localStorage.setItem('medflowRefreshToken', response.data.refresh_token)
         setToken(response.data.access_token)
         setRefreshToken(response.data.refresh_token)
+
+        //  const user_permissions = await apiClient.get("/auth/permissions")
+        //  setPermissions(user_permissions.data.permissions)
+    }
+
+    const getPermissions = async () => {
+        try {
+            const response = await apiClient.get("/auth/permissions");
+
+            setPermissions(response.data.permissions);
+        } catch (error) {
+            console.error("Failed to load permissions:", error);
+            setPermissions([]);
+        }
+    }
+    useEffect(() => {
+        if (token) {
+            getPermissions();
+        } else {
+            setPermissions([]);
+        }
+    }, [token]);
+    const hasPermission = (permission) => {
+    return permissions.includes(permission);
     }
 
     const logout = async () => {
@@ -41,7 +66,7 @@ export function AuthProvider({children}){
         setRefreshToken(null)
     }
 
-    const value = {token, user, isAuthenticated: Boolean(token), login, logout, role: user?.role}
+    const value = {token, user, isAuthenticated: Boolean(token), login, logout, role: user?.role, permissions, hasPermission}
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

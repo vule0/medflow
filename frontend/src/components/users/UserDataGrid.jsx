@@ -19,7 +19,7 @@ import apiClient from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
 
 function UserDataGrid({ onSuccess }) {
-  const { role } = useAuth();
+  const { role, hasPermission } = useAuth();
 
 const ROLE_OPTIONS = [
     "Clinical Admin",
@@ -173,7 +173,7 @@ const ROLE_OPTIONS = [
       flex: 1,
     },
 
-    ...(role === "Clinical Admin"
+    ...(hasPermission("user:write")
       ? [
           {
             field: "actions",
@@ -215,7 +215,7 @@ const ROLE_OPTIONS = [
 
   return (
     <Box sx={{ width: "100%" }}>
-      {role === "Clinical Admin" && (
+      {hasPermission("user:write") && (
         <Button
           variant="outlined"
           sx={{ mb: 2 }}

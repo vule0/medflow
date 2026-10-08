@@ -1,10 +1,15 @@
 from pydantic import BaseModel, ConfigDict, Field
-from app.models import UserRole
+
+class RoleRead(BaseModel):
+    id: int
+    name: str
+    
+    model_config = ConfigDict(from_attributes=True)
 
 class UserBase(BaseModel):
     # id: int
     username: str = Field(min_length=3, max_length=50)
-    role: UserRole
+    role: str
     
 class UserCreate(UserBase):
     password: str = Field(min_length=3)
@@ -16,7 +21,7 @@ class UserRead(UserBase):
     
 class UserUpdate(UserBase):
     username : str | None = Field(default=None, min_length=3, max_length=50)    
-    role: UserRole | None = None
+    role: RoleRead | None = None
 
 class Token(BaseModel):
     access_token: str

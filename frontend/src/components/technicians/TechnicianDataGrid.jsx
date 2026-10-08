@@ -12,8 +12,7 @@ import { useAuth } from "../../context/AuthContext";
 
 
 function TechnicianDataGrid({ onSuccess }) {
-    const { user } = useAuth();
-    const role = user?.role;
+    const { hasPermission } = useAuth();
 
     const [technicians, setTechnicians] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -125,7 +124,7 @@ function TechnicianDataGrid({ onSuccess }) {
         { field: "id", headerName: "ID", flex: 0.5},
         { field: "name", headerName: "Name", flex: 3},
         { field: "hospital_id", headerName: "Hospital ID", flex: .5, type: "number"},
-        ...(role === "Clinical Admin"
+        ...(hasPermission("technician:write")
             ? [
                 {
                     field: "actions",
@@ -158,7 +157,7 @@ function TechnicianDataGrid({ onSuccess }) {
 
     return (
         <Box>
-            {role === "Clinical Admin" && (
+            {hasPermission("technician:write") && (
                 <Button variant="outlined" sx={{ mb: 2 }} onClick={() => setDialogOpen(true)}>Add Technician</Button>
             )}
 

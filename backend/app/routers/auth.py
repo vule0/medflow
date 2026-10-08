@@ -5,19 +5,21 @@ from datetime import datetime, timezone
 from uuid import uuid4
 
 from sqlalchemy import select, func, update
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies import get_db, require_role
+from app.dependencies import get_db, require_role, get_current_user
 from app.models import User, UserRole, RefreshToken
 from app.schemas.user import Token, UserCreate, UserRead, RefreshRequest, LogoutRequest
 from app.security import create_access_token, hash_password, verify_password, create_refresh_token, hash_refresh_token, refresh_token_expiry
+from app.models import Role, RolePermissions
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/token", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(),
                 db: AsyncSession = Depends(get_db)) -> Token:
-    result = await db.execute(select(User).where(User.username == form_data.username))
+    result = await db.execute(select(User).options(selectinload(User.role)).where(User.username == form_data.username))
     user = result.scalar_one_or_none()
     
     if user is None or not verify_password(form_data.password, user.hashed_password):
@@ -27,7 +29,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(),
             headers={"WWW-Authenticate": "Bearer"}
         )
         
-    access_token = create_access_token(data={"sub": user.username, "role": user.role.value, "id": user.id})
+    access_token = create_access_token(data={"sub": user.username, "role": user.role.name, "id": user.id})
     refresh_token = create_refresh_token()
     
     refresh_token_row = RefreshToken(
@@ -105,7 +107,7 @@ async def refresh_access_token(payload: RefreshRequest,
     
     # if refresh token valid, get user
     result = await db.execute(
-        select(User).where(User.id == stored_token.user_id)
+        select(User).options(selectinload(User.role)).where(User.id == stored_token.user_id)
     )
 
     user = result.scalar_one_or_none()
@@ -134,7 +136,7 @@ async def refresh_access_token(payload: RefreshRequest,
     
     db.add(new_refresh_token_row)
     
-    new_access_token = create_access_token(data={"sub": user.username, "role": user.role.value, "id": user.id})
+    new_access_token = create_access_token(data={"sub": user.username, "role": user.role.name, "id": user.id})
     
     await db.commit()
     
@@ -154,3 +156,12 @@ async def logout(payload: LogoutRequest,
         await db.commit()
         
     return {"message": "Logged Out"}
+
+
+@router.get("/permissions")
+async def get_role_permissions(current_user: User = Depends(get_current_user),
+                               db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(RolePermissions.permission).where(RolePermissions.role_id == current_user.role_id))
+    # permissions = ROLE_PERMISSIONS.get(current_user.role, set())
+    permissions = result.scalars().all()
+    return {"permissions": permissions}

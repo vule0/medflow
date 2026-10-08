@@ -30,7 +30,7 @@ import { render } from "@testing-library/react";
 
 function WorkOrderDataGrid({ onSuccess = () => { } }) {
 
-    const { user } = useAuth();
+    const { user, getPermissions, hasPermission } = useAuth();
     const role = user?.role;
 
     const PRIORITY_OPTIONS = [
@@ -243,7 +243,7 @@ function WorkOrderDataGrid({ onSuccess = () => { } }) {
             flex: 0.8,
             type: "number"
         },
-        ...((role === "Clinical Admin" || role === "Field Technician")
+        ...((hasPermission("work_order:write"))
             ? [
                 {
                     field: "actions",
@@ -260,7 +260,7 @@ function WorkOrderDataGrid({ onSuccess = () => { } }) {
                             }
                         />,
 
-                        ...(role === "Clinical Admin" ?
+                        ...(hasPermission("work_order:delete") ?
                             [<GridActionsCellItem
                                 key="delete"
                                 label="Delete"
@@ -292,7 +292,7 @@ function WorkOrderDataGrid({ onSuccess = () => { } }) {
 
     return (
         <Box sx={{ width: "100%" }}>
-            {role === "Clinical Admin" && (
+            {hasPermission("work_order:write") && (
                 <Button
                     variant="outlined"
                     sx={{ mb: 2 }}
@@ -417,13 +417,13 @@ function WorkOrderDataGrid({ onSuccess = () => { } }) {
                         }}
                     >
                         <TextField
-                            disabled={role === "Field Technician"}
+                            disabled={hasPermission("work_order:update_status")}
                             label="Title"
                             value={editFormValues.title}
                             onChange={handleEditFieldChange("title")}
                         />
                         <TextField
-                            disabled={role === "Field Technician"}
+                            disabled={hasPermission("work_order:update_status")}
                             select
                             label="Priority"
                             value={editFormValues.priority}
@@ -454,14 +454,14 @@ function WorkOrderDataGrid({ onSuccess = () => { } }) {
                             ))}
                         </TextField>
                         <TextField
-                            disabled={role === "Field Technician"}
+                            disabled={hasPermission("work_order:update_status")}
                             label="Equipment ID"
                             type="number"
                             value={editFormValues.equipment_id}
                             onChange={handleEditFieldChange("equipment_id")}
                         />
                         <TextField
-                            disabled={role === "Field Technician"}
+                            disabled={hasPermission("work_order:update_status")}
                             label="Technician ID"
                             type="number"
                             value={editFormValues.technician_id}

@@ -26,8 +26,7 @@ import apiClient from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
 
 function ServiceReportDataGrid({ onSuccess = () => { } }) {
-    const { user } = useAuth();
-    const role = user?.role;
+    const { hasPermission } = useAuth();
 
     const [serviceReports, setServiceReports] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -186,7 +185,7 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
             field: 'created_at', headerName: 'Created At', flex: .7, type: 'dateTime',
             valueGetter: (value) => value ? new Date(value) : null
         },
-        ...(role === "Clinical Admin" || role === "Field Technician" ? [{
+        ...(hasPermission("report:write") ? [{
             field: "actions",
             type: "actions",
             headerName: "Actions",
@@ -197,7 +196,7 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
                     onClick={() => handleEdit(params.row)}
                     icon={<EditIcon />}
                 />,
-                ...(role === "Clinical Admin" ? [
+                ...(hasPermission("report:delete") ? [
                     <GridActionsCellItem
                         key="delete"
                         label="Delete"
@@ -212,7 +211,7 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
 
     return (
         <Box>
-            {(role === "Clinical Admin" || role === "Field Technician") && (
+            {hasPermission("report:write") && (
                 <Button
                     variant="outlined"
                     sx={{ mb: 2 }}
