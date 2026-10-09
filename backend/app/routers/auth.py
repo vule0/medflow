@@ -8,11 +8,11 @@ from sqlalchemy import select, func, update
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies import get_db, require_role, get_current_user, require_permission
-from app.models import User, UserRole, RefreshToken
+from app.dependencies import get_db, get_current_user, require_permission
+from app.models import User, RefreshToken
 from app.schemas.user import Token, UserCreate, UserRead, RefreshRequest, LogoutRequest
 from app.security import create_access_token, hash_password, verify_password, create_refresh_token, hash_refresh_token, refresh_token_expiry
-from app.models import Role, RolePermissions, Permissions
+from app.models import RolePermissions, Permissions
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

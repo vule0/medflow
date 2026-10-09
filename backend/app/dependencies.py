@@ -44,29 +44,28 @@ async def get_current_user(token: str = Depends(oauth2_scheme),
     return User(id=user.id,
                 username=user.username,
                 role_id=user.role_id,
-                role=user.role.name)
+                role=user.role)
 
 def require_role(*allowed_roles: UserRole):
     async def role_checker(current_user: User = Depends(get_current_user)) -> User:
         if current_user.role not in allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Role {current_user.role} is not permitted to perform this action)"
+                detail=f"Role {current_user.role.name} is not permitted to perform this action."
             )
         return current_user
     return role_checker
 
-def require_permission(permission: Permissions):
+def require_permission(*permissions: Permissions):
     async def checker(current_user: User = Depends(get_current_user),
                       db: AsyncSession = Depends(get_db)) -> User:
-        
         result = await db.execute(select(RolePermissions.permission).where(RolePermissions.role_id == current_user.role_id))
-        permissions = result.scalars().all()
-        # permissions = ROLE_PERMISSIONS.get(current_user.role, set())
-        if permission not in permissions:
+        user_permissions = set(result.scalars().all())
+
+        if not user_permissions.intersection(permissions):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Missing permission: {permission.value}",
+                detail=f"Missing permission. Required one of: {', '.join(permission.value for permission in permissions)}",
             )
         return current_user
     return checker

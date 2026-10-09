@@ -82,7 +82,7 @@ async def delete_work_order(work_order_id: int,
 async def update_work_order(work_order_id: int,
                             payload: WorkOrderUpdate,
                             db: AsyncSession = Depends(get_db),
-                            _: User = Depends(require_permission(Permissions.WORK_ORDER_WRITE))) -> WorkOrder:
+                            _: User = Depends(require_permission(Permissions.WORK_ORDER_WRITE, Permissions.WORK_ORDER_UPDATE_STATUS))) -> WorkOrder:
     work_order = await db.get(WorkOrder, work_order_id)
             
     if work_order is None:

@@ -24,12 +24,12 @@ ROLE_PERMISSIONS: dict[UserRole, set[Permissions]] = {
         Permissions.USER_READ,
         Permissions.USER_WRITE,
         Permissions.ROLE_MANAGE,
+        Permissions.ADMIN_ROLE
     },
 
     UserRole.FIELD_TECHNICIAN: {
         Permissions.EQUIPMENT_READ,
         Permissions.WORK_ORDER_READ,
-        Permissions.WORK_ORDER_WRITE,
         Permissions.WORK_ORDER_UPDATE_STATUS,
         Permissions.REPORT_READ,
         Permissions.REPORT_WRITE,

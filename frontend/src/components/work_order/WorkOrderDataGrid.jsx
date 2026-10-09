@@ -243,7 +243,7 @@ function WorkOrderDataGrid({ onSuccess = () => { } }) {
             flex: 0.8,
             type: "number"
         },
-        ...((hasPermission("work_order:write"))
+        ...((hasPermission("work_order:write") || hasPermission("work_order:update_status"))
             ? [
                 {
                     field: "actions",

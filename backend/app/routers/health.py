@@ -31,7 +31,7 @@ async def check_db(db: AsyncSession = Depends(get_db)):
         
 @router.get("/detail")
 async def check_db_s3(db: AsyncSession = Depends(get_db),
-                      _: User = Depends(require_role(UserRole.CLINICAL_ADMIN))):
+                      _: User = Depends(require_permission(Permissions.ADMIN_ROLE))):
     try:
         await db.execute(select(1))
         db_status = "ok"

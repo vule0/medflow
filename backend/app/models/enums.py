@@ -47,4 +47,5 @@ class Permissions(str, Enum):
     USER_READ = "user:read"
     USER_WRITE = "user:write"
     
+    ADMIN_ROLE = "admin:role"
     ROLE_MANAGE = "role:manage"
