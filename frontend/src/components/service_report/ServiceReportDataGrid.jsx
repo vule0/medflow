@@ -173,11 +173,12 @@ function ServiceReportDataGrid({ onSuccess = () => { } }) {
 
     const columns = [
         { field: 'id', headerName: 'ID', flex: .2 },
-        { field: 'work_order_id', headerName: "Work Order ID", flex: .5, type: 'number' },
+        { field: 'work_order_id', headerName: "Work Order ID", flex: .4, type: 'number' },
         {
-            field: 'file_url', headerName: 'File URL', flex: 1.5,
+            field: 'file_url', headerName: 'File URL', flex: .5,
             renderCell: (params) => {
-                return (<Link href={params.value} target="_blank" >{params.value}</Link>)
+                // return (<Link href={params.value} target="_blank" >{params.value}</Link>)
+                return (<Button href={params.value} target="_blank" variant="outlined">View Report</Button>)
             }
         },
         { field: 'notes', headerName: 'Notes', flex: 1.5 },

@@ -69,7 +69,10 @@ async def register_user(payload: UserCreate,
 
     user = result.scalar_one()
 
-    return user
+    return UserRead(id=user.id,
+                role= user.role.name,
+                username=user.username,
+                role_id=user.role_id)
 
 @router.post("/refresh", response_model=Token)
 async def refresh_access_token(payload: RefreshRequest,

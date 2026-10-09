@@ -4,8 +4,8 @@ import asyncio
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies import get_db, require_role
-from app.models import User, UserRole
+from app.dependencies import get_db, require_permission, require_role
+from app.models import User, UserRole, Permissions
 from app.s3helper import s3_client, S3_BUCKET
 
 router = APIRouter(prefix="/health", tags=["health"])

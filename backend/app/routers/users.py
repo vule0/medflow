@@ -70,11 +70,7 @@ async def update_user(user_id: int,
         setattr(res, field, value)
     
     await db.commit()
-    statement = (
-        select(User)
-        .options(selectinload(User.role))
-        .where(User.id == user_id)
-    )
+    statement = (select(User).options(selectinload(User.role)).where(User.id == user_id))
 
     result = await db.execute(statement)
     res = result.scalar_one()

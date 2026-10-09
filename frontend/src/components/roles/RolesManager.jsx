@@ -265,18 +265,7 @@ function RolesManager( {onSuccess}) {
                                 }))
                             }
                         />
-                        <DialogActions>
-                            <Button onClick={() => setCreateDialogOpen(false)}>
-                                Cancel
-                            </Button>
-
-                            <Button
-                                variant="contained"
-                                onClick={handleCreate}
-                            >
-                                Save
-                            </Button>
-                        </DialogActions>
+                        
                     </Box>
                     <Typography
 
@@ -313,6 +302,18 @@ function RolesManager( {onSuccess}) {
                     </Box>
 
                 </DialogContent>
+                <DialogActions>
+                            <Button onClick={() => setCreateDialogOpen(false)}>
+                                Cancel
+                            </Button>
+
+                            <Button
+                                variant="contained"
+                                onClick={handleCreate}
+                            >
+                                Save
+                            </Button>
+                        </DialogActions>
 
             </Dialog>
             <Dialog

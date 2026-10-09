@@ -41,14 +41,17 @@ async def get_current_user(token: str = Depends(oauth2_scheme),
     user = result.scalar_one_or_none()
     if user is None:
         raise credentials_exception
-    return user
+    return User(id=user.id,
+                username=user.username,
+                role_id=user.role_id,
+                role=user.role.name)
 
 def require_role(*allowed_roles: UserRole):
     async def role_checker(current_user: User = Depends(get_current_user)) -> User:
         if current_user.role not in allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Role {current_user.role.value} is not permitted to perform this action)"
+                detail=f"Role {current_user.role} is not permitted to perform this action)"
             )
         return current_user
     return role_checker
